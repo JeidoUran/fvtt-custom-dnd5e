@@ -69,7 +69,7 @@ function registerHooks () {
             roll = rolls.initiative
         } else if (hookNames.includes('attack')) {
             const item = config?.subject?.item
-            const weaponType = item?.system?.type?.value
+            const weaponType = item?.system?.type?.baseItem
             roll = (rolls.weaponTypes?.[weaponType]?.die && rolls.weaponTypes?.[weaponType]?.die !== '1d20') ? rolls.weaponTypes[weaponType] : rolls.attack
         } else if (hookNames.includes('skill')) {
             roll = rolls.skill

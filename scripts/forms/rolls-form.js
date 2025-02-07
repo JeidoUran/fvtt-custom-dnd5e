@@ -33,9 +33,9 @@ export class RollsForm extends CustomDnd5eForm {
         const rolls = getSetting(CONSTANTS.ROLLS.SETTING.ROLLS.KEY)
         const weaponTypes = {}
 
-        Object.entries(CONFIG.DND5E.weaponTypes).forEach(([key, value]) => {
+        Object.entries(CONFIG.DND5E.weaponIds).forEach(([key, value]) => {
             const die = rolls.weaponTypes?.[key]?.die || '1d20'
-            const label = value
+            const label = key
             const rollMode = rolls.weaponTypes?.[key]?.rollMode || 'publicroll'
             weaponTypes[key] = { die, label, rollMode }
         })

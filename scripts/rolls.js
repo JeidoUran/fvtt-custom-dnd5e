@@ -74,10 +74,15 @@ function registerHooks () {
             if (typeData) {
                 const { baseItem, value, subtype } = typeData;
                 const isWeapon = Boolean(baseItem);
-                const key = isWeapon ? baseItem : subtype;
-                const category = isWeapon ? rolls.weaponTypes : rolls.featureTypes;
+    
+                const rollCategory = isWeapon ? rolls.weaponTypes 
+                                   : value === 'class' ? rolls.featureTypes 
+                                   : value === 'monster' ? rolls.monsterFeatureTypes 
+                                   : null;
 
-                roll = (category?.[key]?.die && category[key].die !== '1d20') ? category[key] : rolls.attack;
+                const key = isWeapon ? baseItem : subtype;
+    
+                roll = (rollCategory?.[key]?.die && rollCategory[key].die !== '1d20') ? rollCategory[key] : rolls.attack;
             }
         } else if (hookNames.includes('skill')) {
             roll = rolls.skill

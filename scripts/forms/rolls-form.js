@@ -53,6 +53,17 @@ export class RollsForm extends CustomDnd5eForm {
     
         rolls.featureTypes = featureTypes
 
+        const monsterFeatureTypes = {}
+
+        Object.entries(CONFIG.DND5E.featureTypes.monster.subtypes).forEach(([key, value]) => {
+            const die = rolls.monsterFeatureTypes?.[key]?.die || '1d20'
+            const label = value
+            const rollMode = rolls.monsterFeatureTypes?.[key]?.rollMode || 'publicroll'
+            monsterFeatureTypes[key] = { die, label, rollMode }
+        })
+    
+        rolls.monsterFeatureTypes = monsterFeatureTypes
+
     
         return {
             rolls,

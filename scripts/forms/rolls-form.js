@@ -41,6 +41,18 @@ export class RollsForm extends CustomDnd5eForm {
         })
     
         rolls.weaponTypes = weaponTypes
+
+        const featureTypes = {}
+
+        Object.entries(CONFIG.DND5E.featureTypes.class.subtypes).forEach(([key, value]) => {
+            const die = rolls.featureTypes?.[key]?.die || '1d20'
+            const label = value
+            const rollMode = rolls.featureTypes?.[key]?.rollMode || 'publicroll'
+            featureTypes[key] = { die, label, rollMode }
+        })
+    
+        rolls.featureTypes = featureTypes
+
     
         return {
             rolls,

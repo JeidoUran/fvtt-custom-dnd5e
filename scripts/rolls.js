@@ -68,9 +68,17 @@ function registerHooks () {
         } else if (hookNames.includes('initiativeDialog')) {
             roll = rolls.initiative
         } else if (hookNames.includes('attack')) {
-            const item = config?.subject?.item
-            const weaponType = item?.system?.type?.baseItem
-            roll = (rolls.weaponTypes?.[weaponType]?.die && rolls.weaponTypes?.[weaponType]?.die !== '1d20') ? rolls.weaponTypes[weaponType] : rolls.attack
+            const item = config?.subject?.item;
+            const typeData = item?.system?.type;
+
+            if (typeData) {
+                const { baseItem, value, subtype } = typeData;
+                const isWeapon = Boolean(baseItem);
+                const key = isWeapon ? baseItem : subtype;
+                const category = isWeapon ? rolls.weaponTypes : rolls.featureTypes;
+
+                roll = (category?.[key]?.die && category[key].die !== '1d20') ? category[key] : rolls.attack;
+            }
         } else if (hookNames.includes('skill')) {
             roll = rolls.skill
             rollMode = CONFIG.DND5E?.skills[config.skill]?.rollMode

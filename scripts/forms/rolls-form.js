@@ -64,6 +64,18 @@ export class RollsForm extends CustomDnd5eForm {
     
         rolls.monsterFeatureTypes = monsterFeatureTypes
 
+        const opportunityAttackTypes = {}
+
+        Object.entries(CONFIG.DND5E.featureTypes.oppatk.subtypes).forEach(([key, value]) => {
+            const die = rolls.opportunityAttackTypes?.[key]?.die || '1d20'
+            const label = value
+            const rollMode = rolls.opportunityAttackTypes?.[key]?.rollMode || 'publicroll'
+            opportunityAttackTypes[key] = { die, label, rollMode }
+        })
+    
+        rolls.opportunityAttackTypes = opportunityAttackTypes
+
+
     
         return {
             rolls,

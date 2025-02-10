@@ -40,13 +40,13 @@ function registerSettings () {
             config: false,
             type: Object,
             default: {
-                ability: { die: '1d20', rollMode: 'publicroll' },
-                attack: { die: '1d20', rollMode: 'publicroll' },
-                concentration: { die: '1d20', rollMode: 'publicroll' },
-                initiative: { die: '1d20', rollMode: 'publicroll' },
-                savingThrow: { die: '1d20', rollMode: 'publicroll' },
-                skill: { die: '1d20', rollMode: 'publicroll' },
-                tool: { die: '1d20', rollMode: 'publicroll' }
+                ability: { die: '1d20', rollMode: 'default' },
+                attack: { die: '1d20', rollMode: 'default' },
+                concentration: { die: '1d20', rollMode: 'default' },
+                initiative: { die: '1d20', rollMode: 'default' },
+                savingThrow: { die: '1d20', rollMode: 'default' },
+                skill: { die: '1d20', rollMode: 'default' },
+                tool: { die: '1d20', rollMode: 'default' }
             }
         }
     )
@@ -74,16 +74,22 @@ function registerHooks () {
             if (typeData) {
                 const { baseItem, value, subtype } = typeData;
                 const isWeapon = Boolean(baseItem);
-    
+                
                 const rollCategory = isWeapon ? rolls.weaponTypes 
-                                   : value === 'class' ? rolls.featureTypes 
-                                   : value === 'monster' ? rolls.monsterFeatureTypes 
-                                   : value === 'oppatk' ? rolls.opportunityAttackTypes 
-                                   : null;
+                                : value === 'class' ? rolls.featureTypes 
+                                : value === 'monster' ? rolls.monsterFeatureTypes 
+                                : value === 'oppatk' ? rolls.opportunityAttackTypes 
+                                : null;
 
                 const key = isWeapon ? baseItem : subtype;
-    
-                roll = (rollCategory?.[key]?.die && rollCategory[key].die !== '1d20') ? rollCategory[key] : rolls.attack;
+                
+                roll = (rollCategory?.[key]?.die && rollCategory[key].die !== '1d20') 
+                    ? rollCategory[key] 
+                    : rolls.attack;
+
+                rollMode = (rollCategory?.[key]?.rollMode && rollCategory[key].rollMode !== 'default') 
+                    ? rollCategory[key].rollMode 
+                    : rolls.attack.rollMode;
             }
         } else if (hookNames.includes('skill')) {
             roll = rolls.skill
@@ -107,8 +113,8 @@ function registerHooks () {
             config.rolls[0].options.criticalFailure = dieParts.number
         }
 
-        const rollModes = ['gmroll', 'blindroll', 'selfroll']
-        if (rollMode && rollMode !== 'default') {
+        const rollModes = ['publicroll', 'gmroll', 'blindroll', 'selfroll']
+        if (rollModes.includes(rollMode)) {
             message.rollMode = rollMode
         } else if (rollModes.includes(roll.rollMode)) {
             message.rollMode = roll.rollMode

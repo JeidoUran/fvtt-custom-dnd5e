@@ -36,7 +36,7 @@ export class RollsForm extends CustomDnd5eForm {
         Object.entries(CONFIG.DND5E.weaponIds).forEach(([key, value]) => {
             const die = rolls.weaponTypes?.[key]?.die || '1d20'
             const label = key
-            const rollMode = rolls.weaponTypes?.[key]?.rollMode || 'publicroll'
+            const rollMode = rolls.weaponTypes?.[key]?.rollMode || 'default'
             weaponTypes[key] = { die, label, rollMode }
         })
     
@@ -82,6 +82,7 @@ export class RollsForm extends CustomDnd5eForm {
             selects: {
                 rollMode: {
                     choices: {
+                        default: 'CUSTOM_DND5E.default',
                         blindroll: 'CHAT.RollBlind',
                         gmroll: 'CHAT.RollPrivate',
                         publicroll: 'CHAT.RollPublic',

@@ -58,6 +58,7 @@ function registerHooks () {
  */
 async function handleUpdateActor (actor, data, options, userId) {
     if (!actor.isOwner) return
+    if (actor.type === "npc") return
     const hp = foundry.utils.getProperty(data, 'system.attributes.hp.value')
     if (getSetting(CONSTANTS.EXHAUSTION.SETTING.APPLY_EXHAUSTION_ON_ZERO_HP.KEY) && hp === 0) await applyExhaustionZeroHp(actor)
     if (getSetting(CONSTANTS.EXHAUSTION.SETTING.APPLY_EXHAUSTION_ON_COMBAT_END.KEY) && hp === 0) await setExhaustionZeroHpCombatEnd(actor)

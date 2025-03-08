@@ -51,6 +51,10 @@ export class RollsForm extends CustomDnd5eForm {
     }
   };
 
+  async _prepareContext() {
+    const rolls = getSetting(CONSTANTS.ROLLS.SETTING.ROLLS.KEY);
+    const weaponTypes = {};
+
   /* -------------------------------------------- */
 
         Object.entries(CONFIG.DND5E.weaponIds).forEach(([key, value]) => {
@@ -110,9 +114,7 @@ export class RollsForm extends CustomDnd5eForm {
                     }
                 }
             }
-        }
-      }
-    };
+        };
   }
 
   /* -------------------------------------------- */

@@ -49,7 +49,7 @@ export class CustomDnd5eForm extends HandlebarsApplicationMixin(ApplicationV2) {
       dropSelector: listClassSelector
     }],
     position: {
-            width: 650,
+            width: 725,
             height: 680
     },
     scrollable: "custom-dnd5e-scrollable",

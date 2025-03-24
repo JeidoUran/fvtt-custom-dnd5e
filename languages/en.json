@@ -128,6 +128,7 @@
     "CUSTOM_DND5E.featureTypes": "Feature Types",
     "CUSTOM_DND5E.monsterFeatureTypes": "Monster Feature Types",
     "CUSTOM_DND5E.opportunityAttackTypes": "Opportunity Attack Types",
+    "CUSTOM_DND5E.consumableTypes": "Consumable Types",
     "CUSTOM_DND5E.weightModifiers.label": "Weight Modifiers",
     "CUSTOM_DND5E.weightModifiers.note.1": "These settings do not stack. The lower modifier will be used where multiple modifiers apply to an item.",
     "CUSTOM_DND5E.weightModifiers.note.2": "0 will reduce an item's weight by 100%, 0.5 will reduce an item's weight by 50%, 1.25 will increase an item's weight by 25%",

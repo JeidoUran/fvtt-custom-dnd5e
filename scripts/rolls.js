@@ -83,6 +83,7 @@ function registerHooks() {
                                 : value === 'class' ? rolls.featureTypes 
                                 : value === 'monster' ? rolls.monsterFeatureTypes 
                                 : value === 'oppatk' ? rolls.opportunityAttackTypes 
+                                : value === 'thrown' ? rolls.consumableTypes
                                 : null;
 
                 const key = isWeapon ? baseItem : subtype;

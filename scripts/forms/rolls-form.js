@@ -99,6 +99,17 @@ export class RollsForm extends CustomDnd5eForm {
     
         rolls.opportunityAttackTypes = opportunityAttackTypes
 
+        const consumableTypes = {}
+
+        Object.entries(CONFIG.DND5E.consumableTypes.thrown.subtypes).forEach(([key, value]) => {
+            const die = rolls.consumableTypes?.[key]?.die || '1d20'
+            const label = value
+            const rollMode = rolls.consumableTypes?.[key]?.rollMode || 'publicroll'
+            consumableTypes[key] = { die, label, rollMode }
+        })
+    
+        rolls.consumableTypes = consumableTypes
+
 
     
         return {

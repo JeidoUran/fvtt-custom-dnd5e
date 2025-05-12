@@ -5,8 +5,8 @@
   "version": "This is auto replaced",
   "library": "false",
   "compatibility": {
-    "minimum": 12.325,
-    "verified": 12.331,
+    "minimum": 12.331,
+    "verified": 12.343,
     "maximum": 12.999
   },
   "authors": [
@@ -31,11 +31,16 @@
       "name": "English",
       "path": "languages/en.json"
     },
-	{
-		"lang": "pt-BR",
-		"name": "Português (Brasil)",
-		"path": "languages/pt-BR.json"
-	}
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "languages/pt-BR.json"
+    },
+    {
+      "lang": "pl",
+      "name": "Polish",
+      "path": "languages/pl.json"
+    },
   ],
   "packs": [
     {
@@ -68,8 +73,8 @@
       {
         "id": "dnd5e",
         "compatibility":{
-          "minimum": "4.1.0",
-          "verified": "4.3.3",
+          "minimum": "4.3.9",
+          "verified": "4.3.9",
           "maximum": "4.99"
         }
       }

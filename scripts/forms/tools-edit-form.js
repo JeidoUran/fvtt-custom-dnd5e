@@ -1,20 +1,20 @@
 import { CONSTANTS, JOURNAL_HELP_BUTTON, MODULE } from "../constants.js";
 import { ConfigEditForm } from "./config-edit-form.js";
-import { setConfig, getSettingDefault } from "../spell-schools.js";
+import { setConfig, getSettingDefault } from "../tools.js";
 
-const constants = CONSTANTS.SPELL_SCHOOLS;
-const configKey = "spellSchools";
+const constants = CONSTANTS.TOOLS;
+const configKey = "tools";
 
 /**
- * Class representing a form to edit spell schools.
+ * Class representing a form to edit tools.
  * Extends the ConfigEditForm class.
  *
  * @class
  * @extends ConfigEditForm
  */
-export class SpellSchoolsEditForm extends ConfigEditForm {
+export class ToolsEditForm extends ConfigEditForm {
   /**
-   * Constructor for SpellSchoolsEditForm.
+   * Constructor for ToolsEditForm.
    *
    * @param {object} args The arguments to initialize the form.
    */
@@ -37,9 +37,9 @@ export class SpellSchoolsEditForm extends ConfigEditForm {
    * @type {object}
    */
   static DEFAULT_OPTIONS = {
-    id: `${MODULE.ID}-spell-schools-edit-form`,
+    id: `${MODULE.ID}-tools-edit-form`,
     position: {
-      height: 320
+      height: 250
     },
     window: {
       title: `CUSTOM_DND5E.form.${configKey}.edit.title`
@@ -58,25 +58,4 @@ export class SpellSchoolsEditForm extends ConfigEditForm {
       template: constants.TEMPLATE.EDIT
     }
   };
-
-  /* -------------------------------------------- */
-
-  /**
-   * Get the select options for the form.
-   *
-   * @returns {object} The select options.
-   */
-  _getSelects() {
-    return {
-      rollMode: {
-        choices: {
-          default: "CUSTOM_DND5E.default",
-          blindroll: "CHAT.RollBlind",
-          gmroll: "CHAT.RollPrivate",
-          publicroll: "CHAT.RollPublic",
-          selfroll: "CHAT.RollSelf"
-        }
-      }
-    };
-  }
 }

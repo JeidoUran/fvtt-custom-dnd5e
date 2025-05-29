@@ -3,10 +3,12 @@ import { c5eLoadTemplates, getSetting, registerSetting } from "./utils.js";
 import { register as registerHouseRules, registerNegativeHp } from "./house-rules.js";
 import { register as registerAbilities, setConfig as setAbilities } from "./abilities.js";
 import { register as registerActivationCosts, setConfig as setActivationCosts } from "./activation-costs.js";
+import { register as registerActorSheet } from "./actor-sheet.js";
 import { register as registerActorSizes, setConfig as setActorSizes } from "./actor-sizes.js";
 import { register as registerArmorCalculations, setConfig as setArmorCalculations } from "./armor-calculations.js";
 import { register as registerArmorIds, setConfig as setArmorIds } from "./armor-ids.js";
 import { register as registerArmorProficiencies, setConfig as setArmorProficiencies } from "./armor-proficiencies.js";
+import { register as registerBloodied, setConfig as setBloodied } from "./bloodied.js";
 import { register as registerCampSupplies } from "./camp-supplies.js";
 import { register as registerConditions, registerMenu as registerConditionsMenu, setConfig as setConditions } from "./conditions.js";
 import { register as registerConsumableTypes, setConfig as setConsumableTypes } from "./consumable-types.js";
@@ -37,26 +39,26 @@ import { register as registerItemActionTypes, setConfig as setItemActionTypes } 
 import { register as registerItemActivationCostTypes, setConfig as setItemActivationCostTypes } from "./item-activation-cost-types.js";
 import { register as registerItemProperties, setConfig as setItemProperties } from "./item-properties.js";
 import { register as registerItemRarity, setConfig as setItemRarity } from "./item-rarity.js";
-import { register as registerJournalEntryPageSheet } from "./journal-entry-page-sheet.js";
+import { register as registerItemSheet } from "./item-sheet.js";
 import { register as registerLanguages, setConfig as setLanguages } from "./languages.js";
 import { register as registerMigration, migrate } from "./migration.js";
 import { register as registerMisc, setMaxLevel } from "./misc.js";
 import { register as registerRolls } from "./rolls.js";
 import { register as registerSenses, setConfig as setSenses } from "./senses.js";
-import { register as registerSheet } from "./sheet.js";
 import { register as registerSkills, setConfig as setSkills } from "./skills.js";
 import { register as registerSpellSchools, setConfig as setSpellSchools } from "./spell-schools.js";
 import { register as registerRadialStatusEffects } from "./radial-status-effects.js";
 import { register as registerTokenBorder } from "./token-border.js";
+import { register as registerTokenEffects } from "./token-effects.js";
 import { register as registerToolIds, setConfig as setTools } from "./tools.js";
-import { register as registerToolProficiencies, setConfig as setolProficiencies } from "./tool-proficiencies.js";
+import { register as registerToolProficiencies, setConfig as setToolProficiencies } from "./tool-proficiencies.js";
 import { register as registerWeaponIds, setConfig as setWeaponIds } from "./weapon-ids.js";
 import { register as registerWeaponProficiencies, setConfig as setWeaponProficiencies } from "./weapon-proficiencies.js";
 import { patchModifyTokenAttribute } from "./patches/actor-modify-token-attribute.js";
-import { patchApplicationRender } from "./patches/application-render.js";
 import { patchD20Die } from "./patches/d20-die.js";
 import { patchD20Roll } from "./patches/d20-roll.js";
 import { patchPrepareEncumbrance } from "./patches/prepare-encumbrance.js";
+import { patchPrepareSenses } from "./patches/prepare-senses.js";
 import { registerCharacterSheet } from "./sheets/character-sheet.js";
 
 /**
@@ -97,22 +99,23 @@ Hooks.on("init", async () => {
   );
 
   patchModifyTokenAttribute();
-  patchApplicationRender();
   patchD20Die();
   patchD20Roll();
   patchPrepareEncumbrance();
+  patchPrepareSenses();
 
   registerMigration();
   registerCharacterSheet();
-  registerJournalEntryPageSheet();
 
   registerHouseRules();
   registerAbilities();
   registerActivationCosts();
+  registerActorSheet();
   registerActorSizes();
   registerArmorCalculations();
   registerArmorIds();
   registerArmorProficiencies();
+  registerBloodied();
   registerCampSupplies();
   registerConditionsMenu();
   registerConsumableTypes();
@@ -125,10 +128,10 @@ Hooks.on("init", async () => {
   registerItemActivationCostTypes();
   registerItemProperties();
   registerItemRarity();
+  registerItemSheet();
   registerLanguages();
   registerRolls();
   registerSenses();
-  registerSheet();
   registerSkills();
   registerSpellSchools();
   registerToolIds();
@@ -138,13 +141,14 @@ Hooks.on("init", async () => {
   registerMisc();
   registerRadialStatusEffects();
   registerTokenBorder();
+  registerTokenEffects();
   registerDebug();
 
   setAbilities(getSetting(CONSTANTS.ABILITIES.SETTING.CONFIG.KEY));
   setCurrency(getSetting(CONSTANTS.CURRENCY.SETTING.CONFIG.KEY));
   await setEncumbrance(getSetting(CONSTANTS.ENCUMBRANCE.SETTING.CONFIG.KEY));
   setLanguages(getSetting(CONSTANTS.LANGUAGES.SETTING.CONFIG.KEY));
-  // SetSenses(getSetting(CONSTANTS.SENSES.SETTING.KEY))
+  // setSenses(getSetting(CONSTANTS.SENSES.SETTING.CONFIG.KEY));
   setSkills(getSetting(CONSTANTS.SKILLS.SETTING.CONFIG.KEY));
 
   // Must be registered after abilities and skills are set
@@ -154,8 +158,8 @@ Hooks.on("init", async () => {
     CONSTANTS.CONFIG.TEMPLATE.EDIT_IN_LIST,
     CONSTANTS.CONFIG.TEMPLATE.FORM,
     CONSTANTS.CONFIG.TEMPLATE.LIST,
-    CONSTANTS.SHEET.TEMPLATE.CHARACTER_SHEET_2,
-    CONSTANTS.SHEET.TEMPLATE.CHARACTER_DETAILS,
+    CONSTANTS.ACTOR_SHEET.TEMPLATE.CHARACTER_SHEET_2,
+    CONSTANTS.ACTOR_SHEET.TEMPLATE.CHARACTER_DETAILS,
     CONSTANTS.MESSAGE.TEMPLATE.ROLL_REQUEST_CARD,
     "modules/custom-dnd5e/templates/footer.hbs"
   ];
@@ -199,6 +203,7 @@ Hooks.on("ready", async () => {
   setArmorCalculations(getSetting(CONSTANTS.ARMOR_CALCULATIONS.SETTING.CONFIG.KEY));
   setArmorIds(getSetting(CONSTANTS.ARMOR_IDS.SETTING.CONFIG.KEY));
   setArmorProficiencies(getSetting(CONSTANTS.ARMOR_PROFICIENCIES.SETTING.CONFIG.KEY));
+  setBloodied(getSetting(CONSTANTS.BLOODIED.SETTING.CONFIG.KEY));
   setConditions(getSetting(CONSTANTS.CONDITIONS.SETTING.CONFIG.KEY));
   setConsumableTypes(getSetting(CONSTANTS.CONSUMABLE_TYPES.SETTING.CONFIG.KEY));
   setDamageTypes(getSetting(CONSTANTS.DAMAGE_TYPES.SETTING.CONFIG.KEY));
@@ -210,7 +215,7 @@ Hooks.on("ready", async () => {
   setItemRarity(getSetting(CONSTANTS.ITEM_RARITY.SETTING.CONFIG.KEY));
   setSpellSchools(getSetting(CONSTANTS.SPELL_SCHOOLS.SETTING.CONFIG.KEY));
   setTools(getSetting(CONSTANTS.TOOLS.SETTING.CONFIG.KEY));
-  setolProficiencies(getSetting(CONSTANTS.TOOL_PROFICIENCIES.SETTING.CONFIG.KEY));
+  setToolProficiencies(getSetting(CONSTANTS.TOOL_PROFICIENCIES.SETTING.CONFIG.KEY));
   setWeaponIds(getSetting(CONSTANTS.WEAPON_IDS.SETTING.CONFIG.KEY));
   setWeaponProficiencies(getSetting(CONSTANTS.WEAPON_PROFICIENCIES.SETTING.CONFIG.KEY));
   setMaxLevel(getSetting(CONSTANTS.MAX_LEVEL.SETTING.KEY));

@@ -1,27 +1,26 @@
 import { CONSTANTS, JOURNAL_HELP_BUTTON, MODULE } from "../constants.js";
 import { getSetting, setSetting, resetSetting } from "../utils.js";
 import { CustomDnd5eForm } from "./custom-dnd5e-form.js";
-import { setConfig } from "../encumbrance.js";
+import { overrideBloodied, setConfig } from "../bloodied.js";
 
 /**
- * Class representing the Encumbrance Form.
+ * Class representing the Bloodied Form.
  */
-export class EncumbranceForm extends CustomDnd5eForm {
+export class BloodiedForm extends CustomDnd5eForm {
   /**
-   * Constructor for EncumbranceForm.
+   * Constructor for BloodiedForm.
    *
    * @param {...any} args The arguments for the form.
    */
   constructor(...args) {
     super(args);
 
-    this.metric = game.settings.get("dnd5e", "metricWeightUnits") || false;
-    this.enableConfigKey = CONSTANTS.ENCUMBRANCE.SETTING.ENABLE.KEY;
-    this.settingKey = CONSTANTS.ENCUMBRANCE.SETTING.CONFIG.KEY;
+    this.enableConfigKey = CONSTANTS.BLOODIED.SETTING.ENABLE.KEY;
+    this.settingKey = CONSTANTS.BLOODIED.SETTING.CONFIG.KEY;
     this.setConfig = setConfig;
-    this.type = "encumbrance";
+    this.type = "bloodied";
     this.headerButton = JOURNAL_HELP_BUTTON;
-    this.headerButton.uuid = CONSTANTS.ENCUMBRANCE.UUID;
+    this.headerButton.uuid = CONSTANTS.BLOODIED.UUID;
   }
 
   /* -------------------------------------------- */
@@ -33,20 +32,20 @@ export class EncumbranceForm extends CustomDnd5eForm {
    */
   static DEFAULT_OPTIONS = {
     actions: {
-      reset: EncumbranceForm.reset
+      reset: BloodiedForm.reset
     },
     form: {
-      handler: EncumbranceForm.submit
+      handler: BloodiedForm.submit
     },
-    id: `${MODULE.ID}-encumbrance-form`,
+    id: `${MODULE.ID}-bloodied-form`,
     window: {
-      title: "CUSTOM_DND5E.form.encumbrance.title"
+      title: "CUSTOM_DND5E.form.bloodied.title"
     }
   };
 
   static PARTS = {
     form: {
-      template: CONSTANTS.ENCUMBRANCE.TEMPLATE.FORM
+      template: CONSTANTS.BLOODIED.TEMPLATE.FORM
     }
   };
 
@@ -58,15 +57,13 @@ export class EncumbranceForm extends CustomDnd5eForm {
    * @returns {Promise<object>} The context data.
    */
   async _prepareContext() {
-    this.setting = getSetting(this.settingKey) || foundry.utils.deepClone(CONFIG.DND5E.encumbrance);
+    this.setting = getSetting(this.settingKey) || foundry.utils.deepClone(CONFIG.DND5E.bloodied);
     const context = foundry.utils.deepClone(this.setting);
-    context.metric = this.metric;
-    context.equippedItemWeightModifier =
-      getSetting(CONSTANTS.ENCUMBRANCE.EQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY);
-    context.proficientEquippedItemWeightModifier =
-      getSetting(CONSTANTS.ENCUMBRANCE.PROFICIENT_EQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY);
-    context.unequippedItemWeightModifier =
-      getSetting(CONSTANTS.ENCUMBRANCE.UNEQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY);
+    context.applyBloodied = getSetting(CONSTANTS.BLOODIED.SETTING.APPLY_BLOODIED.KEY);
+    context.bloodiedStatus = getSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_STATUS.KEY) || "player";
+    context.bloodiedTint = getSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_TINT.KEY);
+    context.removeBloodiedOnDead = getSetting(CONSTANTS.BLOODIED.SETTING.REMOVE_BLOODIED_ON_DEAD.KEY);
+    context.selects = this.#getSelects();
 
     if ( this.enableConfigKey ) {
       context.enableConfig = getSetting(this.enableConfigKey);
@@ -78,15 +75,35 @@ export class EncumbranceForm extends CustomDnd5eForm {
   /* -------------------------------------------- */
 
   /**
+   * Get the select options for the form.
+   *
+   * @returns {object} The select options.
+   */
+  #getSelects() {
+    return {
+      status: {
+        choices: {
+          all: "SETTINGS.DND5E.BLOODIED.All",
+          player: "SETTINGS.DND5E.BLOODIED.Player",
+          none: "SETTINGS.DND5E.BLOODIED.None"
+        }
+      }
+    };
+  }
+
+  /* -------------------------------------------- */
+
+  /**
    * Reset the form to default settings.
    */
   static async reset() {
     const reset = async () => {
       await Promise.all([
         setSetting(this.settingKey, CONFIG.CUSTOM_DND5E[this.type]),
-        resetSetting(CONSTANTS.ENCUMBRANCE.EQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY),
-        resetSetting(CONSTANTS.ENCUMBRANCE.PROFICIENT_EQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY),
-        resetSetting(CONSTANTS.ENCUMBRANCE.UNEQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY)
+        resetSetting(CONSTANTS.BLOODIED.SETTING.APPLY_BLOODIED.KEY),
+        resetSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_STATUS.KEY),
+        resetSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_TINT.KEY),
+        resetSetting(CONSTANTS.BLOODIED.SETTING.REMOVE_BLOODIED_ON_DEAD.KEY),
       ]);
       this.setConfig(CONFIG.CUSTOM_DND5E[this.type]);
       this.render(true);
@@ -120,7 +137,7 @@ export class EncumbranceForm extends CustomDnd5eForm {
    * @param {object} formData The form data.
    */
   static async submit(event, form, formData) {
-    const ignore = ["enableConfig", "equippedItemWeightModifier", "metric", "partId", "proficientEquippedItemWeightModifier", "unequippedItemWeightModifier"];
+    const ignore = ["enableConfig", "applyBloodied", "bloodiedStatus", "bloodiedTint"];
 
     this.enableConfig = formData.object.enableConfig;
     await setSetting(this.enableConfigKey, this.enableConfig);
@@ -134,12 +151,9 @@ export class EncumbranceForm extends CustomDnd5eForm {
 
     await Promise.all([
       setSetting(this.settingKey, this.setting),
-      setSetting(CONSTANTS.ENCUMBRANCE.EQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY,
-        formData.object.equippedItemWeightModifier),
-      setSetting(CONSTANTS.ENCUMBRANCE.PROFICIENT_EQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY,
-        formData.object.proficientEquippedItemWeightModifier),
-      setSetting(CONSTANTS.ENCUMBRANCE.UNEQUIPPED_ITEM_WEIGHT_MODIFIER.SETTING.KEY,
-        formData.object.unequippedItemWeightModifier)
+      overrideBloodied(formData.object.applyBloodied, formData.object.bloodiedStatus),
+      setSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_TINT.KEY, formData.object.bloodiedTint),
+      setSetting(CONSTANTS.BLOODIED.SETTING.REMOVE_BLOODIED_ON_DEAD.KEY, formData.object.removeBloodiedOnDead)
     ]);
 
     this.setConfig(this.setting);

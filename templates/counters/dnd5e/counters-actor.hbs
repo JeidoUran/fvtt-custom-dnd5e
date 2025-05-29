@@ -1,6 +1,6 @@
 <div id="custom-dnd5e-counters" class="pills-group">
     <h3 class="icon">
-        <i class="fas fa-scroll"></i>
+        <i class="fas fa-tally"></i>
         <span class="roboto-upper">{{localize "CUSTOM_DND5E.counters"}}</span>
         {{#if editable}}
         <a id="custom-dnd5e-counters-edit-button" class="config-button" data-tooltip="{{localize "CUSTOM_DND5E.configureCounters"}}" aria-label="{{localize "CUSTOM_DND5E.configureCounters"}}">
@@ -20,8 +20,7 @@
                     {{counter.label}}
                     {{/if}}
                 </h4>
-                <input type="checkbox" name="flags.custom-dnd5e.{{counter.property}}"
-                    placeholder="false" data-dtype="Boolean" {{#if counter.value}}checked{{/if}}{{#unless counter.canEdit}} disabled{{/unless}}>
+                <dnd5e-checkbox name="flags.custom-dnd5e.{{counter.property}}" {{#if counter.value}}checked{{/if}}{{#unless counter.canEdit}} disabled{{/unless}}></dnd5e-checkbox>
             </div>
         </li>
         {{/if}}

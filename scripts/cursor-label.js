@@ -96,7 +96,10 @@ function createCursorLabelElement() {
  * Attach listeners for cursor movement and key press events.
  */
 function attachCursorLabelListeners() {
-  const chatLog = document.querySelector("#chat-log");
+  const chatNotifications = document.querySelector("#chat-notifications");
+  chatNotifications.addEventListener("pointermove", handleCursorMove);
+  chatNotifications.addEventListener("pointermove", updateCursorLabelPosition);
+  const chatLog = document.querySelector("#chat .chat-log");
   chatLog.addEventListener("pointermove", handleCursorMove);
   chatLog.addEventListener("pointermove", updateCursorLabelPosition);
   document.addEventListener("keydown", updateCursorLabelVisibility, { passive: true, capture: true });
@@ -112,7 +115,6 @@ function attachCursorLabelListeners() {
  * @param {object} data Actor sheet data.
  */
 function attachAppListeners(app, html, data) {
-  if ( html.find ) html = html[0];
   html.addEventListener("pointermove", handleCursorMove);
   html.addEventListener("pointermove", updateCursorLabelPosition);
 }
@@ -159,11 +161,11 @@ function areKeysPressed(event, action) {
   const activeModifiers = {};
   const addModifiers = (key, pressed) => {
     activeModifiers[key] = pressed;
-    KeyboardManager.MODIFIER_CODES[key].forEach(n => activeModifiers[n] = pressed);
+    foundry.helpers.interaction.KeyboardManager.MODIFIER_CODES[key].forEach(n => activeModifiers[n] = pressed);
   };
-  addModifiers(KeyboardManager.MODIFIER_KEYS.CONTROL, event.ctrlKey || event.metaKey);
-  addModifiers(KeyboardManager.MODIFIER_KEYS.SHIFT, event.shiftKey);
-  addModifiers(KeyboardManager.MODIFIER_KEYS.ALT, event.altKey);
+  addModifiers(foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.CONTROL, event.ctrlKey || event.metaKey);
+  addModifiers(foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.SHIFT, event.shiftKey);
+  addModifiers(foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.ALT, event.altKey);
   const isPressed = game.keybindings.get("dnd5e", action).some(b => {
     if ( !(event.type === "keyup" && b.key === event.code) && game.keyboard.downKeys.has(b.key) && b.modifiers.every(m => activeModifiers[m]) ) return true;
     if ( b.modifiers.length ) return false;

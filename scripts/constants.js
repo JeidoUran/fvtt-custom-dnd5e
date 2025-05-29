@@ -16,7 +16,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "abilities-menu",
       HINT: "CUSTOM_DND5E.menu.abilities.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-head-side-brain",
       LABEL: "CUSTOM_DND5E.menu.abilities.label",
       NAME: "CUSTOM_DND5E.menu.abilities.name"
     },
@@ -38,7 +38,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "activation-costs-menu",
       HINT: "CUSTOM_DND5E.menu.activityActivationTypes.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-clock",
       LABEL: "CUSTOM_DND5E.menu.activityActivationTypes.label",
       NAME: "CUSTOM_DND5E.menu.activityActivationTypes.name"
     },
@@ -57,12 +57,41 @@ export const CONSTANTS = {
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.LehHpGOmEbRQ4day"
   },
+  ACTOR_SHEET: {
+    ID: "actor-sheet",
+    MENU: {
+      KEY: "actor-sheet-menu",
+      HINT: "CUSTOM_DND5E.menu.actorSheet.hint",
+      ICON: "fas fa-scroll",
+      LABEL: "CUSTOM_DND5E.menu.actorSheet.label",
+      NAME: "CUSTOM_DND5E.menu.actorSheet.name"
+    },
+    SETTING: {
+      AUTO_FADE_SHEET: { KEY: "auto-fade-sheet" },
+      AUTO_MINIMISE_SHEET: { KEY: "auto-minimise-sheet" },
+      BANNER_IMAGE: { KEY: "banner-image" },
+      SHEET_SCALE: { KEY: "sheet-scale" },
+      SHOW_DEATH_SAVES: { KEY: "show-death-saves" },
+      SHOW_ENCUMBRANCE: { KEY: "show-encumbrance" },
+      SHOW_EXHAUSTION: { KEY: "show-exhaustion" },
+      SHOW_INSPIRATION: { KEY: "show-inspiration" },
+      SHOW_LEGENDARY_ACTIONS: { KEY: "show-legendary-actions" },
+      SHOW_LEGENDARY_RESISTANCE: { KEY: "show-legendary-resistance" },
+      SHOW_MANAGE_CURRENCY: { KEY: "show-manage-currency" },
+      SHOW_USE_LAIR_ACTION: { KEY: "show-use-lair-action" }
+    },
+    TEMPLATE: {
+      FORM: "modules/custom-dnd5e/templates/actor-sheet-form.hbs",
+      CHARACTER_SHEET_2: "modules/custom-dnd5e/templates/sheet/character-sheet-2.hbs",
+      CHARACTER_DETAILS: "modules/custom-dnd5e/templates/sheet/character-details.hbs"
+    }
+  },
   ACTOR_SIZES: {
     ID: "actor-sizes",
     MENU: {
       KEY: "actor-sizes-menu",
       HINT: "CUSTOM_DND5E.menu.actorSizes.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-arrow-up-big-small",
       LABEL: "CUSTOM_DND5E.menu.actorSizes.label",
       NAME: "CUSTOM_DND5E.menu.actorSizes.name"
     },
@@ -84,7 +113,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "armor-calculations-menu",
       HINT: "CUSTOM_DND5E.menu.armorClasses.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-abacus",
       LABEL: "CUSTOM_DND5E.menu.armorClasses.label",
       NAME: "CUSTOM_DND5E.menu.armorClasses.name"
     },
@@ -105,7 +134,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "armor-ids-menu",
       HINT: "CUSTOM_DND5E.menu.armorIds.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-shield-halved",
       LABEL: "CUSTOM_DND5E.menu.armorIds.label",
       NAME: "CUSTOM_DND5E.menu.armorIds.name"
     },
@@ -127,7 +156,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "armor-proficiencies-menu",
       HINT: "CUSTOM_DND5E.menu.armorProficiencies.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-user-shield",
       LABEL: "CUSTOM_DND5E.menu.armorProficiencies.label",
       NAME: "CUSTOM_DND5E.menu.armorProficiencies.name"
     },
@@ -146,6 +175,13 @@ export const CONSTANTS = {
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.mTVSShsLO960Kmrk"
   },
   BLOODIED: {
+    MENU: {
+      KEY: "bloodied-menu",
+      HINT: "CUSTOM_DND5E.menu.bloodied.hint",
+      ICON: "fas fa-droplet",
+      LABEL: "CUSTOM_DND5E.menu.bloodied.label",
+      NAME: "CUSTOM_DND5E.menu.bloodied.name"
+    },
     SETTING: {
       APPLY_BLOODIED: {
         KEY: "apply-bloodied"
@@ -153,16 +189,28 @@ export const CONSTANTS = {
       BLOODIED_ICON: {
         KEY: "bloodied-icon"
       },
+      BLOODIED_STATUS: {
+        KEY: "bloodied-status"
+      },
       BLOODIED_TINT: {
         KEY: "bloodied-tint"
+      },
+      CONFIG: {
+        KEY: "bloodied"
+      },
+      ENABLE: {
+        KEY: "enable-bloodied"
       },
       REMOVE_BLOODIED_ON_DEAD: {
         KEY: "remove-bloodied-on-dead"
       }
     },
+    TEMPLATE: {
+      FORM: "modules/custom-dnd5e/templates/bloodied-form.hbs",
+    },
     ICON: "modules/custom-dnd5e/media/icons/bloodied.svg",
     CONDITION_UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.ngr8w6WBycK59brj.JournalEntryPage.sV0ZCKxwh4n4ZU1P",
-    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.ngr8w6WBycK59brj.JournalEntryPage.P9uilIbvjoLg1l1l"
+    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.GjOBdXwapcYvUihc"
   },
   CHAT_COMMANDS: {
     SETTING: {
@@ -175,7 +223,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "conditions-menu",
       HINT: "CUSTOM_DND5E.menu.conditions.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-skull",
       LABEL: "CUSTOM_DND5E.menu.conditions.label",
       NAME: "CUSTOM_DND5E.menu.conditions.name"
     },
@@ -199,7 +247,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "consumable-types-menu",
       HINT: "CUSTOM_DND5E.menu.consumableTypes.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-flask-round-potion",
       LABEL: "CUSTOM_DND5E.menu.consumableTypes.label",
       NAME: "CUSTOM_DND5E.menu.consumableTypes.name"
     },
@@ -218,7 +266,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "counters-menu",
       HINT: "CUSTOM_DND5E.menu.counters.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-tally",
       LABEL: "CUSTOM_DND5E.menu.counters.label",
       NAME: "CUSTOM_DND5E.menu.counters.name"
     },
@@ -256,7 +304,6 @@ export const CONSTANTS = {
       EDIT: "modules/custom-dnd5e/templates/counters-edit.hbs",
       TRIGGERS_LIST: "modules/custom-dnd5e/templates/counters-triggers-list.hbs",
       DND5E_ACTOR: "modules/custom-dnd5e/templates/counters/dnd5e/counters-actor.hbs",
-      DND5E_ACTOR_LEGACY: "modules/custom-dnd5e/templates/counters/dnd5e/counters-actor-legacy.hbs",
       DND5E_ITEM_GROUP_LEGACY: "modules/custom-dnd5e/templates/counters/dnd5e/counters-item-group-legacy.hbs"
     }
   },
@@ -265,7 +312,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "currency-menu",
       HINT: "CUSTOM_DND5E.menu.currencies.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-coin",
       LABEL: "CUSTOM_DND5E.menu.currencies.label",
       NAME: "CUSTOM_DND5E.menu.currencies.name"
     },
@@ -287,7 +334,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "damage-types-menu",
       HINT: "CUSTOM_DND5E.menu.damageTypes.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-face-head-bandage",
       LABEL: "CUSTOM_DND5E.menu.damageTypes.label",
       NAME: "CUSTOM_DND5E.menu.damageTypes.name"
     },
@@ -372,7 +419,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "encumbrance-menu",
       HINT: "CUSTOM_DND5E.menu.encumbrance.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-weight-hanging",
       LABEL: "CUSTOM_DND5E.menu.encumbrance.label",
       NAME: "CUSTOM_DND5E.menu.encumbrance.name"
     },
@@ -443,7 +490,7 @@ export const CONSTANTS = {
   },
   INSPIRATION: {
     SETTING: {
-      AWARD_INSPIRATION_D20_VALUE: {
+      AWARD_INSPIRATION_DICE_VALUE: {
         KEY: "award-inspiration-d20-value"
       },
       AWARD_INSPIRATION_ROLL_TYPES: {
@@ -494,7 +541,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "item-properties-menu",
       HINT: "CUSTOM_DND5E.menu.itemProperties.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-sparkles",
       LABEL: "CUSTOM_DND5E.menu.itemProperties.label",
       NAME: "CUSTOM_DND5E.menu.itemProperties.name"
     },
@@ -516,7 +563,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "item-rarity-menu",
       HINT: "CUSTOM_DND5E.menu.itemRarity.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-treasure-chest",
       LABEL: "CUSTOM_DND5E.menu.itemRarity.label",
       NAME: "CUSTOM_DND5E.menu.itemRarity.name"
     },
@@ -530,12 +577,28 @@ export const CONSTANTS = {
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.FIMLwqJ6ACWHbuDJ"
   },
+  ITEM_SHEET: {
+    ID: "item-sheet",
+    MENU: {
+      KEY: "item-sheet-menu",
+      HINT: "CUSTOM_DND5E.menu.itemSheet.hint",
+      ICON: "fas fa-scroll",
+      LABEL: "CUSTOM_DND5E.menu.itemSheet.label",
+      NAME: "CUSTOM_DND5E.menu.itemSheet.name"
+    },
+    SETTING: {
+      TOGGLE_IDENTIFIED_ROLE: { KEY: "toggle-identified-role" }
+    },
+    TEMPLATE: {
+      FORM: "modules/custom-dnd5e/templates/item-sheet-form.hbs"
+    }
+  },
   LANGUAGES: {
     ID: "languages",
     MENU: {
       KEY: "languages-menu",
       HINT: "CUSTOM_DND5E.menu.languages.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-comment",
       LABEL: "CUSTOM_DND5E.menu.languages.label",
       NAME: "CUSTOM_DND5E.menu.languages.name"
     },
@@ -618,8 +681,7 @@ export const CONSTANTS = {
       }
     },
     TEMPLATE: {
-      LONG_REST: "modules/custom-dnd5e/templates/long-rest.hbs",
-      LONG_REST_V1: "modules/custom-dnd5e/templates/long-rest-v1.hbs"
+      LONG_REST: "modules/custom-dnd5e/templates/long-rest.hbs"
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.ngr8w6WBycK59brj.JournalEntryPage.lR4mGZPNE02Lbe6t"
   },
@@ -647,7 +709,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "senses-menu",
       HINT: "CUSTOM_DND5E.menu.senses.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-eye",
       LABEL: "CUSTOM_DND5E.menu.senses.label",
       NAME: "CUSTOM_DND5E.menu.senses.name"
     },
@@ -664,35 +726,6 @@ export const CONSTANTS = {
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.UC0cWoAGMtU6yISR"
   },
-  SHEET: {
-    ID: "sheet",
-    MENU: {
-      KEY: "sheet-menu",
-      HINT: "CUSTOM_DND5E.menu.sheet.hint",
-      ICON: "fas fa-pen-to-square",
-      LABEL: "CUSTOM_DND5E.menu.sheet.label",
-      NAME: "CUSTOM_DND5E.menu.sheet.name"
-    },
-    SETTING: {
-      AUTO_FADE_SHEET: { KEY: "auto-fade-sheet" },
-      AUTO_MINIMISE_SHEET: { KEY: "auto-minimise-sheet" },
-      BANNER_IMAGE: { KEY: "banner-image" },
-      SHEET_SCALE: { KEY: "sheet-scale" },
-      SHOW_DEATH_SAVES: { KEY: "show-death-saves" },
-      SHOW_ENCUMBRANCE: { KEY: "show-encumbrance" },
-      SHOW_EXHAUSTION: { KEY: "show-exhaustion" },
-      SHOW_INSPIRATION: { KEY: "show-inspiration" },
-      SHOW_LEGENDARY_ACTIONS: { KEY: "show-legendary-actions" },
-      SHOW_LEGENDARY_RESISTANCE: { KEY: "show-legendary-resistance" },
-      SHOW_MANAGE_CURRENCY: { KEY: "show-manage-currency" },
-      SHOW_USE_LAIR_ACTION: { KEY: "show-use-lair-action" }
-    },
-    TEMPLATE: {
-      FORM: "modules/custom-dnd5e/templates/sheet-form.hbs",
-      CHARACTER_SHEET_2: "modules/custom-dnd5e/templates/sheet/character-sheet-2.hbs",
-      CHARACTER_DETAILS: "modules/custom-dnd5e/templates/sheet/character-details.hbs"
-    }
-  },
   SHOW_PRESSED_KEYS: {
     SETTING: {
       KEY: "show-pressed-keys",
@@ -705,7 +738,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "skills-menu",
       HINT: "CUSTOM_DND5E.menu.skills.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-person-running-fast",
       LABEL: "CUSTOM_DND5E.menu.skills.label",
       NAME: "CUSTOM_DND5E.menu.skills.name"
     },
@@ -727,7 +760,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "spell-schools-menu",
       HINT: "CUSTOM_DND5E.menu.spellSchools.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-book-sparkles",
       LABEL: "CUSTOM_DND5E.menu.spellSchools.label",
       NAME: "CUSTOM_DND5E.menu.spellSchools.name"
     },
@@ -769,7 +802,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "tool-ids-menu",
       HINT: "CUSTOM_DND5E.menu.tools.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-trowel",
       LABEL: "CUSTOM_DND5E.menu.tools.label",
       NAME: "CUSTOM_DND5E.menu.tools.name"
     },
@@ -782,6 +815,7 @@ export const CONSTANTS = {
       }
     },
     TEMPLATE: {
+      EDIT: "modules/custom-dnd5e/templates/tools-edit.hbs",
       FORM: "modules/custom-dnd5e/templates/config-form.hbs",
       LIST: "modules/custom-dnd5e/templates/config-edit-in-list.hbs"
     },
@@ -791,7 +825,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "tool-proficiencies-menu",
       HINT: "CUSTOM_DND5E.menu.toolProficiencies.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-trowel-bricks",
       LABEL: "CUSTOM_DND5E.menu.toolProficiencies.label",
       NAME: "CUSTOM_DND5E.menu.toolProficiencies.name"
     },
@@ -826,7 +860,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "weapon-ids-menu",
       HINT: "CUSTOM_DND5E.menu.weaponIds.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-sword",
       LABEL: "CUSTOM_DND5E.menu.weaponIds.label",
       NAME: "CUSTOM_DND5E.menu.weaponIds.name"
     },
@@ -848,7 +882,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "weapon-proficiencies-menu",
       HINT: "CUSTOM_DND5E.menu.weaponProficiencies.hint",
-      ICON: "fas fa-pen-to-square",
+      ICON: "fas fa-swords",
       LABEL: "CUSTOM_DND5E.menu.weaponProficiencies.label",
       NAME: "CUSTOM_DND5E.menu.weaponProficiencies.name"
     },
@@ -885,33 +919,6 @@ export const SETTING_BY_ENTITY_TYPE = {
 };
 
 export const SHEET_TYPE = {
-  ActorSheet5eCharacter: {
-    countersSetting: CONSTANTS.COUNTERS.SETTING.CHARACTER_COUNTERS.KEY,
-    character: true,
-    custom: false,
-    group: false,
-    legacy: true,
-    npc: true,
-    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ACTOR_LEGACY,
-    insert: {
-      class: ".counters",
-      position: "beforeend"
-    }
-  },
-  ActorSheet5eNPC: {
-    countersSetting: CONSTANTS.COUNTERS.SETTING.NPC_COUNTERS.KEY,
-    character: false,
-    custom: false,
-    group: false,
-    item: false,
-    legacy: true,
-    npc: true,
-    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ACTOR_LEGACY,
-    insert: {
-      class: ".counters",
-      position: "beforeend"
-    }
-  },
   ActorSheet5eCharacter2: {
     countersSetting: CONSTANTS.COUNTERS.SETTING.CHARACTER_COUNTERS.KEY,
     character: true,
@@ -926,7 +933,35 @@ export const SHEET_TYPE = {
       position: "beforeend"
     }
   },
-  CustomDnd5eSheetCharacter2: {
+  CharacterActorSheet: {
+    countersSetting: CONSTANTS.COUNTERS.SETTING.CHARACTER_COUNTERS.KEY,
+    character: true,
+    custom: false,
+    group: false,
+    item: false,
+    legacy: false,
+    npc: true,
+    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ACTOR,
+    insert: {
+      class: ".tab[data-application-part='details'] > .right .top",
+      position: "beforeend"
+    }
+  },
+  NPCActorSheet: {
+    countersSetting: CONSTANTS.COUNTERS.SETTING.NPC_COUNTERS.KEY,
+    character: false,
+    custom: false,
+    group: false,
+    item: false,
+    legacy: false,
+    npc: true,
+    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ACTOR,
+    insert: {
+      class: ".sidebar",
+      position: "afterbegin"
+    }
+  },
+  CustomDnd5eCharacterActorSheet: {
     countersSetting: CONSTANTS.COUNTERS.SETTING.CHARACTER_COUNTERS.KEY,
     character: true,
     custom: true,
@@ -936,7 +971,7 @@ export const SHEET_TYPE = {
     npc: false,
     template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ACTOR,
     insert: {
-      class: ".tab.details > .right .top",
+      class: ".tab[data-application-part='details'] > .col-2 > .right .top",
       position: "beforeend"
     }
   },

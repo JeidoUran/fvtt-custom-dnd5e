@@ -72,56 +72,34 @@ function registerHooks() {
     } else if (hookNames.includes("initiativeDialog")) {
       roll = rolls.initiative;
     } else if (hookNames.includes("attack")) {
-      const weaponType = config?.subject?.item?.system?.type?.value;
-      roll = rolls.weaponTypes?.[weaponType]?.die
-        ? rolls.weaponTypes[weaponType]
-        : rolls.attack;
-      rollMode =
-        rolls.weaponTypes?.[weaponType]?.rollMode &&
-        rolls.weaponTypes?.[weaponType]?.rollMode !== "default"
-          ? rolls.weaponTypes[weaponType].rollMode
-          : rolls.attack.rollMode;
-    } else if (hookNames.includes("skill")) {
-      roll = rolls.skill;
-      rollMode = CONFIG.DND5E?.skills[config.skill]?.rollMode;
-    } else if (hookNames.includes("tool")) {
-      roll = rolls.tool;
-    } else if (hookNames.includes("AbilityCheck")) {
-      roll = rolls.ability;
-      rollMode = CONFIG.DND5E?.abilities[config.ability]?.rollMode;
-    } else if (hookNames.includes("SavingThrow")) {
-      roll = rolls.savingThrow;
-      rollMode = CONFIG.DND5E?.abilities[config.ability]?.rollMode;
-    }
+      const item = config?.subject?.item;
+      const typeData = item?.system?.type;
+      if (typeData) {
+        const { baseItem, value, subtype } = typeData;
+        const isWeapon = Boolean(baseItem);
 
-    if (typeData) {
-      const { baseItem, value, subtype } = typeData;
-      const isWeapon = Boolean(baseItem);
+        const rollCategory = isWeapon
+          ? rolls.weaponTypes
+          : value === "class"
+          ? rolls.featureTypes
+          : value === "monster"
+          ? rolls.monsterFeatureTypes
+          : value === "oppatk"
+          ? rolls.opportunityAttackTypes
+          : value === "thrown"
+          ? rolls.consumableTypes
+          : null;
 
-      const rollCategory = isWeapon
-        ? rolls.weaponTypes
-        : value === "class"
-        ? rolls.featureTypes
-        : value === "monster"
-        ? rolls.monsterFeatureTypes
-        : value === "oppatk"
-        ? rolls.opportunityAttackTypes
-        : value === "thrown"
-        ? rolls.consumableTypes
-        : null;
+        const key = isWeapon ? baseItem : subtype;
 
-      const key = isWeapon ? baseItem : subtype;
+        roll = rollCategory?.[key]?.die ? rollCategory[key] : rolls.attack;
 
-      roll =
-        rollCategory?.[key]?.die && rollCategory[key].die !== "1d20"
-          ? rollCategory[key]
-          : rolls.attack;
-
-      rollMode =
-        rollCategory?.[key]?.rollMode &&
-        rollCategory[key].rollMode !== "default"
-          ? rollCategory[key].rollMode
-          : rolls.attack.rollMode;
+        rollMode =
+          rollCategory?.[key]?.rollMode &&
+          rollCategory[key].rollMode !== "default"
+            ? rollCategory[key].rollMode
+            : rolls.attack.rollMode;
+      }
     } else if (hookNames.includes("skill")) {
       roll = rolls.skill;
       rollMode = CONFIG.DND5E?.skills[config.skill]?.rollMode;

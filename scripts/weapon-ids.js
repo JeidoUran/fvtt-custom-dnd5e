@@ -6,7 +6,8 @@ import {
   registerMenu,
   registerSetting,
   resetDnd5eConfig,
-  resetSetting } from "./utils.js";
+  resetSetting,
+} from "./utils.js";
 import { WeaponIdsForm } from "./forms/config-form.js";
 
 const constants = CONSTANTS.WEAPON_IDS;
@@ -25,39 +26,30 @@ export function register() {
  * Register settings.
  */
 function registerSettings() {
-  registerMenu(
-    constants.MENU.KEY,
-    {
-      hint: game.i18n.localize(constants.MENU.HINT),
-      label: game.i18n.localize(constants.MENU.LABEL),
-      name: game.i18n.localize(constants.MENU.NAME),
-      icon: constants.MENU.ICON,
-      type: WeaponIdsForm,
-      restricted: true,
-      scope: "world"
-    }
-  );
+  registerMenu(constants.MENU.KEY, {
+    hint: game.i18n.localize(constants.MENU.HINT),
+    label: game.i18n.localize(constants.MENU.LABEL),
+    name: game.i18n.localize(constants.MENU.NAME),
+    icon: constants.MENU.ICON,
+    type: WeaponIdsForm,
+    restricted: true,
+    scope: "world",
+  });
 
-  registerSetting(
-    constants.SETTING.ENABLE.KEY,
-    {
-      scope: "world",
-      config: false,
-      requiresReload: true,
-      type: Boolean,
-      default: false
-    }
-  );
+  registerSetting(constants.SETTING.ENABLE.KEY, {
+    scope: "world",
+    config: false,
+    requiresReload: true,
+    type: Boolean,
+    default: true,
+  });
 
-  registerSetting(
-    constants.SETTING.CONFIG.KEY,
-    {
-      scope: "world",
-      config: false,
-      type: Object,
-      default: getSettingDefault()
-    }
-  );
+  registerSetting(constants.SETTING.CONFIG.KEY, {
+    scope: "world",
+    config: false,
+    type: Object,
+    default: getSettingDefault(),
+  });
 }
 
 /* -------------------------------------------- */
@@ -89,11 +81,13 @@ export async function resetConfigSetting() {
  * @returns {void}
  */
 export function setConfig(settingData = null) {
-  if ( !getSetting(constants.SETTING.ENABLE.KEY) ) return;
-  if ( checkEmpty(settingData) ) return handleEmptyData();
+  if (!getSetting(constants.SETTING.ENABLE.KEY)) return;
+  if (checkEmpty(settingData)) return handleEmptyData();
 
   const mergedSettingData = foundry.utils.mergeObject(
-    foundry.utils.mergeObject(settingData, CONFIG.DND5E[configKey], { overwrite: false }),
+    foundry.utils.mergeObject(settingData, CONFIG.DND5E[configKey], {
+      overwrite: false,
+    }),
     getSettingDefault(),
     { overwrite: false }
   );
@@ -102,7 +96,7 @@ export function setConfig(settingData = null) {
 
   Hooks.callAll("customDnd5e.setWeaponIdsConfig", configData);
 
-  if ( configData ) {
+  if (configData) {
     CONFIG.DND5E[configKey] = configData;
   }
 }
@@ -113,7 +107,7 @@ export function setConfig(settingData = null) {
  * Handle empty data.
  */
 function handleEmptyData() {
-  if ( checkEmpty(CONFIG.DND5E[configKey]) ) {
+  if (checkEmpty(CONFIG.DND5E[configKey])) {
     resetDnd5eConfig(configKey);
   }
 }
@@ -128,8 +122,11 @@ function handleEmptyData() {
 function buildConfig(settingData) {
   return Object.fromEntries(
     Object.keys(settingData)
-      .filter(key => settingData[key].visible || settingData[key].visible === undefined)
-      .map(key => [key, buildConfigEntry(settingData[key])])
+      .filter(
+        (key) =>
+          settingData[key].visible || settingData[key].visible === undefined
+      )
+      .map((key) => [key, buildConfigEntry(settingData[key])])
   );
 }
 
@@ -143,4 +140,3 @@ function buildConfig(settingData) {
 function buildConfigEntry(data) {
   return game.i18n.localize(data.label || data);
 }
-

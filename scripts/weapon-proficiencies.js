@@ -7,7 +7,8 @@ import {
   registerMenu,
   registerSetting,
   resetDnd5eConfig,
-  resetSetting } from "./utils.js";
+  resetSetting,
+} from "./utils.js";
 import { WeaponProficienciesForm } from "./forms/weapon-proficiencies-form.js";
 
 const constants = CONSTANTS.WEAPON_PROFICIENCIES;
@@ -18,10 +19,7 @@ const constants = CONSTANTS.WEAPON_PROFICIENCIES;
 export function register() {
   registerSettings();
 
-  const templates = [
-    constants.TEMPLATE.FORM,
-    constants.TEMPLATE.LIST
-  ];
+  const templates = [constants.TEMPLATE.FORM, constants.TEMPLATE.LIST];
   c5eLoadTemplates(templates);
 }
 
@@ -29,39 +27,30 @@ export function register() {
  * Register settings,
  */
 function registerSettings() {
-  registerMenu(
-    constants.MENU.KEY,
-    {
-      hint: game.i18n.localize(constants.MENU.HINT),
-      label: game.i18n.localize(constants.MENU.LABEL),
-      name: game.i18n.localize(constants.MENU.NAME),
-      icon: constants.MENU.ICON,
-      type: WeaponProficienciesForm,
-      restricted: true,
-      scope: "world"
-    }
-  );
+  registerMenu(constants.MENU.KEY, {
+    hint: game.i18n.localize(constants.MENU.HINT),
+    label: game.i18n.localize(constants.MENU.LABEL),
+    name: game.i18n.localize(constants.MENU.NAME),
+    icon: constants.MENU.ICON,
+    type: WeaponProficienciesForm,
+    restricted: true,
+    scope: "world",
+  });
 
-  registerSetting(
-    constants.SETTING.ENABLE.KEY,
-    {
-      scope: "world",
-      config: false,
-      requiresReload: true,
-      type: Boolean,
-      default: false
-    }
-  );
+  registerSetting(constants.SETTING.ENABLE.KEY, {
+    scope: "world",
+    config: false,
+    requiresReload: true,
+    type: Boolean,
+    default: true,
+  });
 
-  registerSetting(
-    constants.SETTING.CONFIG.KEY,
-    {
-      scope: "world",
-      config: false,
-      type: Object,
-      default: getSettingDefault()
-    }
-  );
+  registerSetting(constants.SETTING.CONFIG.KEY, {
+    scope: "world",
+    config: false,
+    type: Object,
+    default: getSettingDefault(),
+  });
 }
 
 /* -------------------------------------------- */
@@ -103,8 +92,8 @@ function buildData(config) {
   Object.entries(config.weaponTypes).forEach(([key, value]) => {
     const map = config.weaponProficienciesMap[key];
 
-    if ( map ) {
-      if ( !foundry.utils.hasProperty(data[map], "children") ) {
+    if (map) {
+      if (!foundry.utils.hasProperty(data[map], "children")) {
         data[map].children = {};
       }
       data[map].children[key] = value;
@@ -124,15 +113,19 @@ function buildData(config) {
  * @returns {void}
  */
 export function setConfig(settingData = null) {
-  if ( !getSetting(constants.SETTING.ENABLE.KEY) ) return;
-  const properties = ["weaponProficiencies", "weaponProficienciesMap", "weaponTypes"];
-  if ( checkEmpty(settingData) ) return handleEmptyData(properties);
+  if (!getSetting(constants.SETTING.ENABLE.KEY)) return;
+  const properties = [
+    "weaponProficiencies",
+    "weaponProficienciesMap",
+    "weaponTypes",
+  ];
+  if (checkEmpty(settingData)) return handleEmptyData(properties);
 
   // Initialise the config object
   const config = {
     weaponProficiencies: {},
     weaponProficienciesMap: {},
-    weaponTypes: {}
+    weaponTypes: {},
   };
 
   // Populate config
@@ -141,12 +134,14 @@ export function setConfig(settingData = null) {
     .forEach(([key, value]) => {
       const localisedLabel = game.i18n.localize(value.label ?? value);
 
-      if ( Object.keys(value.children ?? {}).length ) {
+      if (Object.keys(value.children ?? {}).length) {
         config.weaponProficiencies[key] = localisedLabel;
 
         Object.entries(value.children).forEach(([childKey, childValue]) => {
           config.weaponProficienciesMap[childKey] = key;
-          config.weaponTypes[childKey] = game.i18n.localize(childValue.label ?? childValue);
+          config.weaponTypes[childKey] = game.i18n.localize(
+            childValue.label ?? childValue
+          );
         });
       } else {
         config.weaponTypes[key] = localisedLabel;
@@ -154,11 +149,11 @@ export function setConfig(settingData = null) {
     });
 
   // Apply the config to CONFIG.DND5E
-  properties.forEach(property => {
+  properties.forEach((property) => {
     const hookLabel = property.charAt(0).toUpperCase() + property.slice(1);
     Hooks.callAll(`customDnd5e.set${hookLabel}Config`, config[property]);
 
-    if ( Object.keys(config[property]).length ) {
+    if (Object.keys(config[property]).length) {
       CONFIG.DND5E[property] = config[property];
     }
   });
@@ -171,8 +166,8 @@ export function setConfig(settingData = null) {
  * @param {string[]} properties The properties
  */
 function handleEmptyData(properties) {
-  properties.forEach(property => {
-    if ( checkEmpty(CONFIG.DND5E[property]) ) {
+  properties.forEach((property) => {
+    if (checkEmpty(CONFIG.DND5E[property])) {
       resetDnd5eConfig(property);
     }
   });

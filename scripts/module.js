@@ -30,6 +30,8 @@ import {
   decreaseFailure,
   modifyFailure
 } from "./counters.js";
+import { register as registerAutomation } from "./automation.js";
+import { register as registerCreatureTypes, setConfig as setCreatureTypes } from "./creature-types.js";
 import { register as registerCurrency, setConfig as setCurrency } from "./currency.js";
 import { register as registerDamageTypes, setConfig as setDamageTypes } from "./damage-types.js";
 import { register as registerDebug } from "./debug.js";
@@ -107,6 +109,7 @@ Hooks.on("init", async () => {
   registerMigration();
   registerCharacterSheet();
 
+  registerAutomation();
   registerHouseRules();
   registerAbilities();
   registerActivationCosts();
@@ -120,6 +123,7 @@ Hooks.on("init", async () => {
   registerConditionsMenu();
   registerConsumableTypes();
   registerCounters();
+  registerCreatureTypes();
   registerCurrency();
   registerDamageTypes();
   registerEncumbrance();
@@ -151,6 +155,7 @@ Hooks.on("init", async () => {
   }
   setCurrency(getSetting(CONSTANTS.CURRENCY.SETTING.CONFIG.KEY));
   await setEncumbrance(getSetting(CONSTANTS.ENCUMBRANCE.SETTING.CONFIG.KEY));
+  setItemRarity(getSetting(CONSTANTS.ITEM_RARITY.SETTING.CONFIG.KEY));
   setLanguages(getSetting(CONSTANTS.LANGUAGES.SETTING.CONFIG.KEY));
   // setSenses(getSetting(CONSTANTS.SENSES.SETTING.CONFIG.KEY));
   setSkills(getSetting(CONSTANTS.SKILLS.SETTING.CONFIG.KEY));
@@ -206,6 +211,7 @@ Hooks.on("ready", async () => {
   setBloodied(getSetting(CONSTANTS.BLOODIED.SETTING.CONFIG.KEY));
   setConditions(getSetting(CONSTANTS.CONDITIONS.SETTING.CONFIG.KEY));
   setConsumableTypes(getSetting(CONSTANTS.CONSUMABLE_TYPES.SETTING.CONFIG.KEY));
+  setCreatureTypes(getSetting(CONSTANTS.CREATURE_TYPES.SETTING.CONFIG.KEY));
   setDamageTypes(getSetting(CONSTANTS.DAMAGE_TYPES.SETTING.CONFIG.KEY));
   const isV4 = foundry.utils.isNewerVersion(game.dnd5e.version, "3.3.1");
   if ( !isV4 ) {
@@ -213,7 +219,6 @@ Hooks.on("ready", async () => {
     setItemActivationCostTypes(getSetting(CONSTANTS.ITEM_ACTIVATION_COST_TYPES.SETTING.CONFIG.KEY));
   }
   setItemProperties(getSetting(CONSTANTS.ITEM_PROPERTIES.SETTING.CONFIG.KEY));
-  setItemRarity(getSetting(CONSTANTS.ITEM_RARITY.SETTING.CONFIG.KEY));
   setSpellSchools(getSetting(CONSTANTS.SPELL_SCHOOLS.SETTING.CONFIG.KEY));
   setTools(getSetting(CONSTANTS.TOOLS.SETTING.CONFIG.KEY));
   setToolProficiencies(getSetting(CONSTANTS.TOOL_PROFICIENCIES.SETTING.CONFIG.KEY));

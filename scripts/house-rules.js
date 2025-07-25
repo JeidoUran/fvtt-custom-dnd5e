@@ -10,7 +10,7 @@ import {
   makeDead,
   unmakeDead,
   makeUnconscious,
-  unmakeUnconscious,
+  unmakeUnconscious
 } from "./utils.js";
 import { HouseRulesForm } from "./forms/house-rules-form.js";
 
@@ -502,7 +502,7 @@ function recalculateDamage(actor, amount, updates, options) {
   Logger.debug("Recalculating damage...");
 
   const isDelta = options.isDelta ?? false;
-  const hpMax = actor?.system?.attributes?.hp?.max ?? 0;
+  const hpMax = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
   const hpTemp = actor?.system?.attributes?.hp?.temp ?? 0;
   const hpValue = actor?.system?.attributes?.hp?.value ?? 0;
   const healFromZero = getSetting(CONSTANTS.HIT_POINTS.SETTING.NEGATIVE_HP_HEAL_FROM_ZERO.KEY);
@@ -574,10 +574,14 @@ function updateDead(actor, updates) {
   Logger.debug("Updating Dead...");
 
   const currentHp = foundry.utils.getProperty(updates, "system.attributes.hp.value");
+  const maxHp = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
 
   if ( typeof currentHp === "undefined" ) return null;
 
-  if ( currentHp <= 0 ) {
+  if ( maxHp === 0 ) {
+    Logger.debug("Dead not updated. Max HP is 0.");
+    return false;
+  } else if ( currentHp <= 0 ) {
     makeDead(actor, updates);
     Logger.debug("Dead updated", { dead: true });
     return true;
@@ -604,10 +608,14 @@ function updateUnconscious(actor, updates) {
   Logger.debug("Updating Unconscious...");
 
   const currentHp = foundry.utils.getProperty(updates, "system.attributes.hp.value");
+  const maxHp = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
 
   if ( typeof currentHp === "undefined" ) return null;
 
-  if ( currentHp <= 0 ) {
+  if ( maxHp === 0 ) {
+    Logger.debug("Unconscious not updated. Max HP is 0.");
+    return false;
+  } else if ( currentHp <= 0 ) {
     makeUnconscious(actor, updates);
     Logger.debug("Unconscious updated", { unconscious: true });
     return true;
@@ -711,7 +719,7 @@ function updateHpMeter(app, html, data) {
 
   const actor = app.actor;
   const hpValue = actor.system.attributes.hp.value;
-  const hpMax = actor.system.attributes.hp.max;
+  const hpMax = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
 
   if ( hpValue >= 0 ) return;
 
@@ -741,7 +749,7 @@ function applyInstantDeath(actor, updates) {
 
   const previousHp = actor?.system?.attributes?.hp?.value;
   const currentHp = foundry.utils.getProperty(updates, "system.attributes.hp.value");
-  const maxHp = actor.system.attributes.hp.max;
+  const maxHp = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
 
   if ( previousHp < 0 && Math.abs(previousHp) >= maxHp ) return true;
 
@@ -782,7 +790,7 @@ function applyMassiveDamage(actor, updates) {
   if ( previousHp <= currentHp ) return;
 
   const diffHp = previousHp - currentHp;
-  const maxHp = actor.system.attributes.hp.max;
+  const maxHp = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
   const halfMaxHp = Math.floor(maxHp / 2);
 
   if ( diffHp >= halfMaxHp ) {

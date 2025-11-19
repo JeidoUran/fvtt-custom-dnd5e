@@ -1,5 +1,6 @@
 import { CONSTANTS, SHEET_TYPE } from "../constants.js";
 import { updateBloodied } from "../configurations/bloodied.js";
+import { register as registerAverageDamage } from "./average-damage.js";
 import { register as registerMobDamage } from "./mob-damage.js";
 import { register as registerProbabilisticDamage } from "./probalistic-damage.js";
 import {
@@ -26,6 +27,7 @@ const constants = CONSTANTS.GAMEPLAY;
 export function register() {
   registerSettings();
   registerHooks();
+  registerAverageDamage();
   registerMobDamage();
   registerProbabilisticDamage();
 
@@ -279,19 +281,23 @@ function registerHooks() {
   Hooks.on("dnd5e.preRestCompleted", (actor, data) => updateDeathSaves("rest", actor, data));
   Hooks.on("dnd5e.preRollDeathSave", setDeathSavesRollMode);
   Hooks.on("dnd5e.rollAbilityCheck", (actor, roll, ability) => { awardInspiration("rollAbilityCheck", actor, roll); });
-  Hooks.on("dnd5e.rollAbilitySave", (actor, roll, ability) => { awardInspiration("rollAbilitySave", actor, roll); });
   Hooks.on("dnd5e.rollAbilityTest", (actor, roll, ability) => { awardInspiration("rollAbilityTest", actor, roll); });
   Hooks.on("dnd5e.rollAttack", (item, roll, ability) => {
     awardInspiration("rollAttack", item, roll);
     // applyHighLowGround(item, roll, ability);
   });
+  Hooks.on("dnd5e.rollSavingThrow", (actor, roll, ability) => { awardInspiration("rollSavingThrow", actor, roll); });
   Hooks.on("dnd5e.rollSkill", (actor, roll, ability) => { awardInspiration("rollSkill", actor, roll); });
+  Hooks.on("dnd5e.rollToolCheck", (actor, roll, ability) => { awardInspiration("rollToolCheck", actor, roll); });
   Hooks.on("preUpdateActor", (actor, data, options, userId) => {
     capturePreviousData(actor, data, options, userId);
+    healActor(actor, data, options);
     updateDeathSaves("regainHp", actor, data, options);
   });
   Hooks.on("renderActorSheet", makeDeathSavesBlind);
   Hooks.on("renderActorSheet", updateHpMeter);
+  Hooks.on("renderActorSheetV2", makeDeathSavesBlind);
+  Hooks.on("renderActorSheetV2", updateHpMeter);
 }
 
 /* -------------------------------------------- */
@@ -329,19 +335,20 @@ export function setHitDiceRollFormula(actor, item, rollData, messageData) {
  * @param {object} data The data
  */
 export function modifyHitPointsFlowDialog(app, html, data) {
+  const element = (html instanceof jQuery) ? html[0] : html;
   const minimumValue = getSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.MINIMUM_VALUE.SETTING.KEY);
   if ( minimumValue > 1 ) {
     const rerollOnce = getSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.ONCE.SETTING.KEY);
     const note = (rerollOnce) ? "CUSTOM_DND5E.dialog.levelUpHitPointsRerollOnce.note" : "CUSTOM_DND5E.dialog.levelUpHitPointsRerollForever.note";
-    const h3 = html.querySelector("form h3");
-    const p = document.createElement("p");
-    p.classList.add("custom-dnd5e-advice", "notes", "hp-note");
-    p.textContent = game.i18n.format(note, { minimumValue });
-    h3.after(p);
+    const h3 = element.querySelector("form h3");
+    const div = document.createElement("div");
+    div.classList.add("custom-dnd5e-note", "info");
+    div.textContent = game.i18n.format(note, { minimumValue });
+    h3.after(div);
   }
 
   if ( !getSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.SHOW_TAKE_AVERAGE.SETTING.KEY) ) {
-    const averageLabel = html.querySelector(".averageLabel") ?? html.querySelector(".average-label");
+    const averageLabel = element.querySelector(".averageLabel") ?? element.querySelector(".average-label");
 
     if ( averageLabel ) {
       averageLabel.innerHTML = "";
@@ -398,20 +405,21 @@ export function applyHighLowGround(item, roll, ability) {
 /* -------------------------------------------- */
 
 /**
- * Triggered by the 'dnd5e.rollAbilityCheck', 'dnd5e.rollAbilitySave', 'dnd5e.rollAbilityTest', 'dnd5e.rollAttack',
- * and 'dnd5e.rollSkill' hooks.
+ * Triggered by the 'dnd5e.rollAbilityCheck', 'dnd5e.rollAbilityTest', 'dnd5e.rollAttack',
+ * 'dnd5e.rollSavingThrow', 'dnd5e.rollSkill' and 'dnd5e.rollToolCheck' hooks.
  * If the roll matches the 'Award Inspiration D20 Value', award inspiration to the actor.
  * If the actor already has inspiration, do not award it again.
- * @param {string} rollType The roll type: rollAbilityCheck, rollAbilitySave, rollAbilityTest, rollAttack, rollSkill
+ * @param {string} rollType The roll type: rollAbilityCheck, rollAbilityTest, rollAttack,
+ *   rollSavingThrow, rollSkill, rollToolCheck
  * @param {object} roll The roll
  * @param {object} data The data
  */
 export function awardInspiration(rollType, roll, data) {
   Logger.debug("Triggering Award Inspiration...");
 
-  const actor = (rollType === "rollAttack") ? data.subject.actor : data.subject;
+  const actor = (rollType === "rollAttack") ? data.subject?.actor : data.subject;
 
-  if ( actor.type === "npc" || !getSetting(CONSTANTS.INSPIRATION.SETTING.AWARD_INSPIRATION_ROLL_TYPES.KEY)?.[rollType] ) return;
+  if ( actor?.type === "npc" || !getSetting(CONSTANTS.INSPIRATION.SETTING.AWARD_INSPIRATION_ROLL_TYPES.KEY)?.[rollType] ) return;
 
   const awardInspirationDieTotal = getSetting(CONSTANTS.INSPIRATION.SETTING.AWARD_INSPIRATION_DICE_VALUE.KEY);
   const diceTotal = roll[0].terms[0].total;
@@ -493,6 +501,34 @@ function setDeathSavesRollMode(config, dialog, message) {
 /* -------------------------------------------- */
 
 /**
+ * Triggered by the 'preUpdateActor' hook.
+ * If 'Heal from 0 HP' is enabled, recalculate healing to increase HP from zero instead of the negative value.
+ * @param {object} actor The actor
+ * @param {object} data The data
+ * @param {object} options The options
+ */
+function healActor(actor, data, options) {
+  const { dnd5e } = options;
+
+  if ( !foundry.utils.hasProperty(data,"system.attributes.hp.value") ) return;
+
+  const applyNegativeHp = getSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_NEGATIVE_HP.KEY);
+  const applyInstantDeath = getSetting(CONSTANTS.DEAD.SETTING.APPLY_INSTANT_DEATH.KEY);
+  const healFromZero = getSetting(CONSTANTS.HIT_POINTS.SETTING.NEGATIVE_HP_HEAL_FROM_ZERO.KEY);
+
+  if ( !(applyNegativeHp || applyInstantDeath) || !healFromZero ) return;
+
+  if ( dnd5e.hp.value < 0 ) {
+    const newHp = data.system.attributes.hp.value - dnd5e.hp.value;
+    if ( newHp > 0 && newHp > data.system.attributes.hp.value ) {
+      data.system.attributes.hp.value = newHp;
+    }
+  }
+}
+
+/* -------------------------------------------- */
+
+/**
  * Triggered by the 'dnd5e.preApplyDamage' hook.
  * If 'Apply Negative HP' or 'Apply Instant Death' is enabled, recalculate damage to apply a negative value to HP.
  * If 'Heal from 0 HP' is enabled, recalculate healing to increase HP from zero instead of the negative value.
@@ -511,8 +547,7 @@ function recalculateDamage(actor, amount, updates, options) {
   const hpMax = actor?.system?.attributes?.hp?.effectiveMax ?? actor?.system?.attributes?.hp?.max ?? 0;
   const hpTemp = actor?.system?.attributes?.hp?.temp ?? 0;
   const hpValue = actor?.system?.attributes?.hp?.value ?? 0;
-  const healFromZero = getSetting(CONSTANTS.HIT_POINTS.SETTING.NEGATIVE_HP_HEAL_FROM_ZERO.KEY);
-  const startHp = (healFromZero && amount < 0 && hpValue < 0) ? 0 : hpValue;
+  const startHp = hpValue;
 
   let newHpValue = updates["system.attributes.hp.value"];
 
@@ -520,9 +555,6 @@ function recalculateDamage(actor, amount, updates, options) {
     newHpValue = hpValue - Math.max(amount - hpTemp, 0);
   } else {
     let healing = Math.abs(amount);
-    if ( hpValue < 0 && healFromZero && !isDelta ) {
-      healing = healing - Math.abs(hpValue);
-    }
     newHpValue = Math.min(startHp + healing, hpMax);
   }
 
@@ -709,7 +741,7 @@ function updateHp(actor, updates) {
 /* -------------------------------------------- */
 
 /**
- * Triggered by the 'renderActorSheet' hook.
+ * Triggered by the 'renderActorSheet' and 'renderActorSheetV2' hook.
  * If the current HP is negative, update the HP meter to show a red bar.
  * This will indicate that the character is below 0 HP.
  * @param {object} app The app
@@ -733,7 +765,7 @@ function updateHpMeter(app, html, data) {
   meter.classList.add("negative");
 
   const progress = html.querySelector(".progress.hit-points");
-  const pct = Math.abs(hpValue / hpMax) * 100;
+  const pct = Math.min(Math.abs(hpValue / hpMax) * 100, 100);
   progress.style = `--bar-percentage: ${pct}%;`;
 
   Logger.debug("HP meter updated");

@@ -35,13 +35,16 @@ import { register as registerCurrency, setConfig as setCurrency } from "./config
 import { register as registerDamageTypes, setConfig as setDamageTypes } from "./configurations/damage-types.js";
 import { register as registerDebug } from "./debug.js";
 import { register as registerEncumbrance, setConfig as setEncumbrance } from "./configurations/encumbrance.js";
+import { register as registerEquipmentTypes, setConfig as setEquipmentTypes } from "./configurations/misc-equipment-types.js";
 import { register as registerExhaustion } from "./gameplay/exhaustion.js";
+import { register as registerFeatureTypes, setConfig as setFeatureTypes } from "./configurations/feature-types.js";
 import { register as registerItemActionTypes, setConfig as setItemActionTypes } from "./configurations/item-action-types.js";
 import { register as registerItemActivationCostTypes, setConfig as setItemActivationCostTypes } from "./configurations/item-activation-cost-types.js";
 import { register as registerItemProperties, setConfig as setItemProperties } from "./configurations/item-properties.js";
 import { register as registerItemRarity, setConfig as setItemRarity } from "./configurations/item-rarity.js";
 import { register as registerItemSheet } from "./item-sheet.js";
 import { register as registerLanguages, setConfig as setLanguages } from "./configurations/languages.js";
+import { register as registerLootTypes, setConfig as setLootTypes } from "./configurations/loot-types.js";
 import { register as registerMigration, migrate } from "./migration.js";
 import { register as registerMisc, setMaxLevel } from "./misc.js";
 import { register as registerRolls } from "./rolls.js";
@@ -125,13 +128,16 @@ Hooks.on("init", async () => {
   registerCurrency();
   registerDamageTypes();
   registerEncumbrance();
+  registerEquipmentTypes();
   registerExhaustion();
+  registerFeatureTypes();
   registerItemActionTypes();
   registerItemActivationCostTypes();
   registerItemProperties();
   registerItemRarity();
   registerItemSheet();
   registerLanguages();
+  registerLootTypes();
   registerRolls();
   registerSenses();
   registerSkills();
@@ -211,12 +217,15 @@ Hooks.on("ready", async () => {
   setConsumableTypes(getSetting(CONSTANTS.CONSUMABLE_TYPES.SETTING.CONFIG.KEY));
   setCreatureTypes(getSetting(CONSTANTS.CREATURE_TYPES.SETTING.CONFIG.KEY));
   setDamageTypes(getSetting(CONSTANTS.DAMAGE_TYPES.SETTING.CONFIG.KEY));
+  setEquipmentTypes(getSetting(CONSTANTS.MISC_EQUIPMENT_TYPES.SETTING.CONFIG.KEY));
+  setFeatureTypes(getSetting(CONSTANTS.FEATURE_TYPES.SETTING.CONFIG.KEY));
   const isV4 = foundry.utils.isNewerVersion(game.dnd5e.version, "3.3.1");
   if ( !isV4 ) {
     setItemActionTypes(getSetting(CONSTANTS.ITEM_ACTION_TYPES.SETTING.CONFIG.KEY));
     setItemActivationCostTypes(getSetting(CONSTANTS.ITEM_ACTIVATION_COST_TYPES.SETTING.CONFIG.KEY));
   }
   setItemProperties(getSetting(CONSTANTS.ITEM_PROPERTIES.SETTING.CONFIG.KEY));
+  setLootTypes(getSetting(CONSTANTS.LOOT_TYPES.SETTING.CONFIG.KEY));
   setSpellSchools(getSetting(CONSTANTS.SPELL_SCHOOLS.SETTING.CONFIG.KEY));
   setTools(getSetting(CONSTANTS.TOOLS.SETTING.CONFIG.KEY));
   setToolProficiencies(getSetting(CONSTANTS.TOOL_PROFICIENCIES.SETTING.CONFIG.KEY));

@@ -41,7 +41,8 @@ export function migrate() {
 
   let isSuccess = true;
   isSuccess = (!migrationVersion || foundry.utils.isNewerVersion("1.3.4", migrationVersion)) ? migrateRollMode() : true;
-  isSuccess = (!migrationVersion || foundry.utils.isNewerVersion("1.4.0", migrationVersion)) ? migrateAwardInspirationRollType() : true;
+  isSuccess = (!migrationVersion || foundry.utils.isNewerVersion("2.2.4", migrationVersion)) ? migrateConditions() : true;
+  isSuccess = (!migrationVersion || foundry.utils.isNewerVersion("2.3.0", migrationVersion)) ? migrateAwardInspirationRollType() : true;
 
   if ( isSuccess ) {
     setSetting(constants.VERSION.SETTING.KEY, moduleVersion);
@@ -94,10 +95,50 @@ export async function migrateAwardInspirationRollType() {
   const rollTypes = getSetting(CONSTANTS.INSPIRATION.SETTING.AWARD_INSPIRATION_ROLL_TYPES.KEY);
   if ( !rollTypes ) return true;
   const newRollTypes = foundry.utils.deepClone(rollTypes);
+
+  if ( newRollTypes.rollAbilitySave ) {
+    newRollTypes.rollSavingThrow = newRollTypes.rollAbilitySave;
+    delete newRollTypes.rollAbilitySave;
+  }
+
   if ( newRollTypes.rollAbilityTest ) {
     newRollTypes.rollAbilityCheck = newRollTypes.rollAbilityTest;
     delete newRollTypes.rollAbilityTest;
   }
+
   await setSetting(CONSTANTS.INSPIRATION.SETTING.AWARD_INSPIRATION_ROLL_TYPES.KEY, newRollTypes);
   return true;
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Migrate condition settings to use 'name' and 'img' properties instead of 'label' and 'icon'.
+ * @returns {Promise<boolean>} Whether the migration was successful
+ */
+export async function migrateConditions() {
+  try {
+    Logger.debug("Migrating conditions...");
+    const conditions = foundry.utils.deepClone(getSetting(CONSTANTS.CONDITIONS.SETTING.CONFIG.KEY));
+
+    if ( !conditions ) return true;
+
+    for (const value of Object.values(conditions)) {
+      const name = value?.name ?? value?.label;
+      const img = value?.img ?? value?.icon;
+
+      value.name = name;
+      value.img = img;
+
+      delete value.label;
+      delete value.icon;
+    }
+
+    await setSetting(CONSTANTS.CONDITIONS.SETTING.CONFIG.KEY, conditions);
+    Logger.debug("Conditions migrated.");
+    return true;
+  } catch (err) {
+    Logger.debug(err.message, err);
+    return false;
+  }
 }

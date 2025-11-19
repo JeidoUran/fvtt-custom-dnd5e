@@ -223,22 +223,45 @@
             <div class="form-group stacked checkbox-grid">
                 <label style="flex: 0 0 100%;">{{localize "CUSTOM_DND5E.rollTypes"}}</label>
                 <p class="hint">{{localize "CUSTOM_DND5E.form.gameplay.inspiration.awardInspirationRollTypes.note"}}</p>
-                <label class="checkbox">
-                    <dnd5e-checkbox id="custom-dnd5e-rollAbilityCheck" name="awardInspirationRollTypes.rollAbilityCheck"{{#if awardInspirationRollTypes.rollAbilityCheck}} checked{{/if}}></dnd5e-checkbox>
-                    <span>{{localize "CUSTOM_DND5E.abilityCheck"}}</span>
-                </label>
-                <label class="checkbox">
-                    <dnd5e-checkbox id="custom-dnd5e-rollAttack" name="awardInspirationRollTypes.rollAttack"{{#if awardInspirationRollTypes.rollAttack}} checked{{/if}}></dnd5e-checkbox>
-                    <span>{{localize "CUSTOM_DND5E.attackRoll"}}</span>
-                </label>
-                <label class="checkbox">
-                    <dnd5e-checkbox id="custom-dnd5e-rollAbilitySave" name="awardInspirationRollTypes.rollAbilitySave"{{#if awardInspirationRollTypes.rollAbilitySave}} checked{{/if}}></dnd5e-checkbox>
-                    <span>{{localize "CUSTOM_DND5E.savingThrow"}}</span>
-                </label>
-                <label class="checkbox">
-                    <dnd5e-checkbox id="custom-dnd5e-rollSkill" name="awardInspirationRollTypes.rollSkill"{{#if awardInspirationRollTypes.rollSkill}} checked{{/if}}></dnd5e-checkbox>
-                    <span>{{localize "CUSTOM_DND5E.skillCheck"}}</span>
-                </label>
+                <div class="form-fields">
+                    <label class="checkbox">
+                        <dnd5e-checkbox id="custom-dnd5e-rollAbilityCheck" name="awardInspirationRollTypes.rollAbilityCheck"{{#if awardInspirationRollTypes.rollAbilityCheck}} checked{{/if}}></dnd5e-checkbox>
+                        <span>{{localize "CUSTOM_DND5E.abilityCheck"}}</span>
+                    </label>
+                    <label class="checkbox">
+                        <dnd5e-checkbox id="custom-dnd5e-rollAttack" name="awardInspirationRollTypes.rollAttack"{{#if awardInspirationRollTypes.rollAttack}} checked{{/if}}></dnd5e-checkbox>
+                        <span>{{localize "CUSTOM_DND5E.attackRoll"}}</span>
+                    </label>
+                    <label class="checkbox">
+                        <dnd5e-checkbox id="custom-dnd5e-rollSavingThrow" name="awardInspirationRollTypes.rollSavingThrow"{{#if awardInspirationRollTypes.rollSavingThrow}} checked{{/if}}></dnd5e-checkbox>
+                        <span>{{localize "CUSTOM_DND5E.savingThrow"}}</span>
+                    </label>
+                    <label class="checkbox">
+                        <dnd5e-checkbox id="custom-dnd5e-rollSkill" name="awardInspirationRollTypes.rollSkill"{{#if awardInspirationRollTypes.rollSkill}} checked{{/if}}></dnd5e-checkbox>
+                        <span>{{localize "CUSTOM_DND5E.skillCheck"}}</span>
+                    </label>
+                    <label class="checkbox">
+                        <dnd5e-checkbox id="custom-dnd5e-rollToolCheck" name="awardInspirationRollTypes.rollToolCheck"{{#if awardInspirationRollTypes.rollToolCheck}} checked{{/if}}></dnd5e-checkbox>
+                        <span>{{localize "CUSTOM_DND5E.toolCheck"}}</span>
+                    </label>
+                    </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>
+                <span>{{localize "CUSTOM_DND5E.averageDamage"}}</span>
+                <button type="button" class="unbutton control-button" data-action="help" data-uuid="Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.ngr8w6WBycK59brj.JournalEntryPage.v2HNu6zP1mJYuxw0" data-tooltip="{{localize "CUSTOM_DND5E.openGuide"}}" aria-label="{{localize "CUSTOM_DND5E.openGuide"}}">
+                    <i class="fas fa-circle-info" inert></i>
+                </button>
+            </legend>
+            <div class="form-group">
+                <label>{{localize "CUSTOM_DND5E.form.gameplay.averageDamage.use.label"}}</label>
+                <div class="form-fields">
+                    <select id="custom-dnd5e-use-average-damage" name="useAverageDamage">
+                        {{selectOptions selects.averageDamage.choices selected=useAverageDamage localize=true}}
+                    </select>
+                </div>
+                <p class="hint">{{localize "CUSTOM_DND5E.form.gameplay.averageDamage.use.note"}}</p>
             </div>
         </fieldset>
         <fieldset>

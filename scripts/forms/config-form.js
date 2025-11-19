@@ -24,11 +24,14 @@ import { resetConfigSetting as resetConditions, setConfig as setConditions } fro
 import { resetConfigSetting as resetCreatureTypes, setConfig as setCreatureTypes } from "../configurations/creature-types.js";
 import { resetConfigSetting as resetCurrency, setConfig as setCurrency } from "../configurations/currency.js";
 import { resetConfigSetting as resetDamageTypes, setConfig as setDamageTypes } from "../configurations/damage-types.js";
+import { resetConfigSetting as resetEquipmentTypes, setConfig as setEquipmentTypes } from "../configurations/misc-equipment-types.js";
+import { resetConfigSetting as resetFeatureTypes, setConfig as setFeatureTypes } from "../configurations/feature-types.js";
 import { resetConfigSetting as resetItemActionTypes, setConfig as setItemActionTypes } from "../configurations/item-action-types.js";
 import { resetConfigSetting as resetItemActivationCostTypes, setConfig as setItemActivationCostTypes } from "../configurations/item-activation-cost-types.js";
 import { resetConfigSetting as resetItemProperties, setConfig as setItemProperties } from "../configurations/item-properties.js";
 import { resetConfigSetting as resetItemRarity, setConfig as setItemRarity } from "../configurations/item-rarity.js";
 import { resetConfigSetting as resetLanguages, setConfig as setLanguages } from "../configurations/languages.js";
+import { resetConfigSetting as resetLootTypes, setConfig as setLootTypes } from "../configurations/loot-types.js";
 import { resetConfigSetting as resetSenses, setConfig as setSenses } from "../configurations/senses.js";
 import { resetConfigSetting as resetSkills, setConfig as setSkills } from "../configurations/skills.js";
 import { resetConfigSetting as resetSpellSchools, setConfig as setSpellSchools } from "../configurations/spell-schools.js";
@@ -667,7 +670,6 @@ export class CurrencyForm extends ConfigForm {
    */
   constructor() {
     super();
-    this.disableCreate = true;
     this.editForm = CurrencyEditForm;
     this.requiresReload = true;
     this.enableConfigKey = CONSTANTS.CURRENCY.SETTING.ENABLE.KEY;
@@ -733,6 +735,86 @@ export class DamageTypesForm extends ConfigForm {
     }
   };
 }
+
+/* -------------------------------------------- */
+
+/**
+ * Class representing the Equipment Types Form.
+ * @extends ConfigForm
+ */
+export class MiscEquipmentTypesForm extends ConfigForm {
+  /**
+   * Constructor for MiscEquipmentTypesForm.
+   */
+  constructor() {
+    super();
+    this.editInList = true;
+    this.requiresReload = false;
+    this.enableConfigKey = CONSTANTS.MISC_EQUIPMENT_TYPES.SETTING.ENABLE.KEY;
+    this.settingKey = CONSTANTS.MISC_EQUIPMENT_TYPES.SETTING.CONFIG.KEY;
+    this.resetConfigSetting = resetEquipmentTypes;
+    this.setConfig = setEquipmentTypes;
+    this.configKey = "miscEquipmentTypes";
+    this.headerButton = JOURNAL_HELP_BUTTON;
+    this.headerButton.uuid = CONSTANTS.MISC_EQUIPMENT_TYPES.UUID;
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Default options for the form.
+   *
+   * @type {object}
+   */
+  static DEFAULT_OPTIONS = {
+    id: `${MODULE.ID}-equipment-types-form`,
+    window: {
+      title: "CUSTOM_DND5E.form.miscEquipmentTypes.title"
+    }
+  };
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Class representing the Feature Types Form.
+ *
+ * @extends ConfigForm
+ */
+export class FeatureTypesForm extends ConfigForm {
+  /**
+   * Constructor for FeatureTypesForm.
+   */
+  constructor() {
+    super();
+    this.editInList = true;
+    this.nestable = true;
+    this.nestType = "subtypes";
+    this.requiresReload = false;
+    this.enableConfigKey = CONSTANTS.FEATURE_TYPES.SETTING.ENABLE.KEY;
+    this.settingKey = CONSTANTS.FEATURE_TYPES.SETTING.CONFIG.KEY;
+    this.resetConfigSetting = resetFeatureTypes;
+    this.setConfig = setFeatureTypes;
+    this.configKey = "featureTypes";
+    this.headerButton = JOURNAL_HELP_BUTTON;
+    this.headerButton.uuid = CONSTANTS.FEATURE_TYPES.UUID;
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Default options for the form.
+   *
+   * @type {object}
+   */
+  static DEFAULT_OPTIONS = {
+    id: `${MODULE.ID}-feature-types-form`,
+    window: {
+      title: "CUSTOM_DND5E.form.featureTypes.title"
+    }
+  };
+}
+
 
 /* -------------------------------------------- */
 
@@ -923,6 +1005,44 @@ export class LanguagesForm extends ConfigForm {
     id: `${MODULE.ID}-languages-form`,
     window: {
       title: "CUSTOM_DND5E.form.languages.title"
+    }
+  };
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Class representing the Loot Types Form.
+ * @extends ConfigForm
+ */
+export class LootTypesForm extends ConfigForm {
+  /**
+   * Constructor for ItemRarityForm.
+   */
+  constructor() {
+    super();
+    this.editInList = true;
+    this.requiresReload = false;
+    this.enableConfigKey = CONSTANTS.LOOT_TYPES.SETTING.ENABLE.KEY;
+    this.settingKey = CONSTANTS.LOOT_TYPES.SETTING.CONFIG.KEY;
+    this.resetConfigSetting = resetLootTypes;
+    this.setConfig = setLootTypes;
+    this.configKey = "lootTypes";
+    this.headerButton = JOURNAL_HELP_BUTTON;
+    this.headerButton.uuid = CONSTANTS.LOOT_TYPES.UUID;
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Default options for the form.
+   *
+   * @type {object}
+   */
+  static DEFAULT_OPTIONS = {
+    id: `${MODULE.ID}-loot-types-form`,
+    window: {
+      title: "CUSTOM_DND5E.form.lootTypes.title"
     }
   };
 }

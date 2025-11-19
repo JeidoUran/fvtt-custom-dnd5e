@@ -174,6 +174,13 @@ export const CONSTANTS = {
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.mTVSShsLO960Kmrk"
   },
+  AVERAGE_DAMAGE: {
+    SETTING: {
+      USE: {
+        KEY: "use-average-damage"
+      }
+    }
+  },
   BLOODIED: {
     MENU: {
       KEY: "bloodied-menu",
@@ -460,6 +467,25 @@ export const CONSTANTS = {
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.QK8bAMxx9x9IaTHl"
   },
+  MISC_EQUIPMENT_TYPES: {
+    ID: "miscEquipmentTypes",
+    MENU: {
+      KEY: "misc-equipment-types-menu",
+      HINT: "CUSTOM_DND5E.menu.miscEquipmentTypes.hint",
+      ICON: "fas fa-ring-diamond",
+      LABEL: "CUSTOM_DND5E.menu.miscEquipmentTypes.label",
+      NAME: "CUSTOM_DND5E.menu.miscEquipmentTypes.name"
+    },
+    SETTING: {
+      ENABLE: {
+        KEY: "enable-misc-equipment-types"
+      },
+      CONFIG: {
+        KEY: "misc-equipment-types"
+      }
+    },
+    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.koB9uAZtQ9f2n1f8"
+  },
   EXHAUSTION: {
     SETTING: {
       APPLY_EXHAUSTION_ON_ZERO_HP: {
@@ -475,6 +501,25 @@ export const CONSTANTS = {
         KEY: "exhaustion-saving-throw-dc"
       }
     }
+  },
+  FEATURE_TYPES: {
+    ID: "feature-types",
+    MENU: {
+      KEY: "feature-types-menu",
+      HINT: "CUSTOM_DND5E.menu.featureTypes.hint",
+      ICON: "fas fa-list",
+      LABEL: "CUSTOM_DND5E.menu.featureTypes.label",
+      NAME: "CUSTOM_DND5E.menu.featureTypes.name"
+    },
+    SETTING: {
+      ENABLE: {
+        KEY: "enable-feature-types"
+      },
+      CONFIG: {
+        KEY: "feature-types"
+      }
+    },
+    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.dgX7G9bkLoEif6pk"
   },
   HIT_POINTS: {
     SETTING: {
@@ -587,7 +632,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "item-rarity-menu",
       HINT: "CUSTOM_DND5E.menu.itemRarity.hint",
-      ICON: "fas fa-treasure-chest",
+      ICON: "fas fa-gem",
       LABEL: "CUSTOM_DND5E.menu.itemRarity.label",
       NAME: "CUSTOM_DND5E.menu.itemRarity.name"
     },
@@ -659,6 +704,25 @@ export const CONSTANTS = {
         }
       }
     }
+  },
+  LOOT_TYPES: {
+    ID: "lootTypes",
+    MENU: {
+      KEY: "loot-types-menu",
+      HINT: "CUSTOM_DND5E.menu.lootTypes.hint",
+      ICON: "fas fa-treasure-chest",
+      LABEL: "CUSTOM_DND5E.menu.lootTypes.label",
+      NAME: "CUSTOM_DND5E.menu.lootTypes.name"
+    },
+    SETTING: {
+      ENABLE: {
+        KEY: "enable-loot-types"
+      },
+      CONFIG: {
+        KEY: "loot-types"
+      }
+    },
+    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.Jly3oGH0ntybdpBu"
   },
   MAX_ABILITY_SCORE: {
     SETTING: {
@@ -901,7 +965,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "tool-proficiencies-menu",
       HINT: "CUSTOM_DND5E.menu.toolProficiencies.hint",
-      ICON: "fas fa-trowel-bricks",
+      ICON: "fas fa-hammer-brush",
       LABEL: "CUSTOM_DND5E.menu.toolProficiencies.label",
       NAME: "CUSTOM_DND5E.menu.toolProficiencies.name"
     },

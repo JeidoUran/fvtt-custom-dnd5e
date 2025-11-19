@@ -7,13 +7,13 @@ import {
   registerSetting,
   resetDnd5eConfig,
   resetSetting } from "../utils.js";
-import { FeatureTypesForm } from "../forms/config-form.js";
+import { MiscEquipmentTypesForm } from "../forms/config-form.js";
 
-const constants = CONSTANTS.FEATURE_TYPES;
-const configKey = "featureTypes";
+const constants = CONSTANTS.MISC_EQUIPMENT_TYPES;
+const configKey = "miscEquipmentTypes";
 
 /**
- * Register settings.
+ * Register settings and hooks.
  */
 export function register() {
   registerSettings();
@@ -32,7 +32,7 @@ function registerSettings() {
       label: game.i18n.localize(constants.MENU.LABEL),
       name: game.i18n.localize(constants.MENU.NAME),
       icon: constants.MENU.ICON,
-      type: FeatureTypesForm,
+      type: MiscEquipmentTypesForm,
       restricted: true,
       scope: "world"
     }
@@ -65,7 +65,7 @@ function registerSettings() {
 /**
  * Get default config.
  * @param {string|null} key The key
- * @returns {object} The config
+ * @returns {object} The config data
  */
 export function getSettingDefault(key = null) {
   return getDefaultDnd5eConfig(configKey, key);
@@ -84,7 +84,7 @@ export async function resetConfigSetting() {
 /* -------------------------------------------- */
 
 /**
- * Set CONFIG.DND5E.featureTypes.
+ * Set CONFIG.DND5E.miscEquipmentTypes.
  * @param {object} [settingData=null] The setting data
  * @returns {void}
  */
@@ -100,13 +100,12 @@ export function setConfig(settingData = null) {
 
   const configData = buildConfig(mergedSettingData);
 
-  Hooks.callAll("customDnd5e.setFeatureTypesConfig", configData);
+  Hooks.callAll("customDnd5e.setEquipmentTypesConfig", configData);
 
   if ( configData ) {
     CONFIG.DND5E[configKey] = configData;
   }
 }
-
 
 /* -------------------------------------------- */
 
@@ -124,14 +123,13 @@ function handleEmptyData() {
 /**
  * Build config.
  * @param {object} settingData The setting data
- * @param {boolean} [isSubtype=false] Whether the data is a subtype
  * @returns {object} The config data
  */
-function buildConfig(settingData, isSubtype = false) {
+function buildConfig(settingData) {
   return Object.fromEntries(
     Object.keys(settingData)
       .filter(key => settingData[key].visible || settingData[key].visible === undefined)
-      .map(key => [key, buildConfigEntry(settingData[key], isSubtype)])
+      .map(key => [key, buildConfigEntry(settingData[key])])
   );
 }
 
@@ -140,18 +138,8 @@ function buildConfig(settingData, isSubtype = false) {
 /**
  * Build config entry.
  * @param {object} data The data
- * @param {boolean} [isSubtype=false] Whether the data is a subtype
  * @returns {object} The config entry
  */
-function buildConfigEntry(data, isSubtype = false) {
-  if ( isSubtype ) {
-    return game.i18n.localize(data.label || data);
-  } else {
-    return {
-      label: game.i18n.localize(data.label || data),
-      ...(data.subtypes !== undefined && {
-        subtypes: buildConfig(data.subtypes, true)
-      })
-    };
-  }
+function buildConfigEntry(data) {
+  return game.i18n.localize(data.label || data);
 }

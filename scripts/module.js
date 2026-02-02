@@ -8,7 +8,8 @@ import { register as registerActorSizes, setConfig as setActorSizes } from "./co
 import { register as registerArmorCalculations, setConfig as setArmorCalculations } from "./configurations/armor-calculations.js";
 import { register as registerArmorIds, setConfig as setArmorIds } from "./configurations/armor-ids.js";
 import { register as registerArmorProficiencies, setConfig as setArmorProficiencies } from "./configurations/armor-proficiencies.js";
-import { register as registerBloodied, setConfig as setBloodied } from "./configurations/bloodied.js";
+import { register as registerBastions, setConfig as setBastions } from "./configurations/bastions.js";
+import { register as registerBloodied, setConfig as setBloodied, addBloodiedCondition } from "./configurations/bloodied.js";
 import { register as registerCampSupplies } from "./gameplay/camp-supplies.js";
 import { register as registerConditions, registerMenu as registerConditionsMenu, setConfig as setConditions } from "./configurations/conditions.js";
 import { register as registerConsumableTypes, setConfig as setConsumableTypes } from "./configurations/consumable-types.js";
@@ -69,7 +70,11 @@ import { registerCharacterSheet } from "./sheets/character-sheet.js";
  * Initialize the module and register settings, hooks, and templates.
  */
 Hooks.on("init", async () => {
+  // Suppress deprecation warnings during deep clone
+  const originalWarn = console.warn;
+  console.warn = () => {};
   CONFIG.CUSTOM_DND5E = foundry.utils.deepClone(CONFIG.DND5E);
+  console.warn = originalWarn;
 
   const module = game.modules.get(MODULE.ID);
   module.api = {
@@ -119,6 +124,7 @@ Hooks.on("init", async () => {
   registerArmorCalculations();
   registerArmorIds();
   registerArmorProficiencies();
+  registerBastions();
   registerBloodied();
   registerCampSupplies();
   registerConditionsMenu();
@@ -212,8 +218,10 @@ Hooks.on("ready", async () => {
   setArmorCalculations(getSetting(CONSTANTS.ARMOR_CALCULATIONS.SETTING.CONFIG.KEY));
   setArmorIds(getSetting(CONSTANTS.ARMOR_IDS.SETTING.CONFIG.KEY));
   setArmorProficiencies(getSetting(CONSTANTS.ARMOR_PROFICIENCIES.SETTING.CONFIG.KEY));
+  setBastions(getSetting(CONSTANTS.BASTIONS.SETTING.CONFIG.KEY));
   setBloodied(getSetting(CONSTANTS.BLOODIED.SETTING.CONFIG.KEY));
   setConditions(getSetting(CONSTANTS.CONDITIONS.SETTING.CONFIG.KEY));
+  addBloodiedCondition();
   setConsumableTypes(getSetting(CONSTANTS.CONSUMABLE_TYPES.SETTING.CONFIG.KEY));
   setCreatureTypes(getSetting(CONSTANTS.CREATURE_TYPES.SETTING.CONFIG.KEY));
   setDamageTypes(getSetting(CONSTANTS.DAMAGE_TYPES.SETTING.CONFIG.KEY));

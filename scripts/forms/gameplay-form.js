@@ -27,6 +27,7 @@ export class GameplayForm extends CustomDnd5eForm {
    */
   static DEFAULT_OPTIONS = {
     actions: {
+      clearMassiveDamageTable: GameplayForm.clearMassiveDamageTable,
       reset: GameplayForm.reset
     },
     form: {
@@ -59,11 +60,14 @@ export class GameplayForm extends CustomDnd5eForm {
    * @returns {Promise<object>} The context data.
    */
   async _prepareContext() {
+    const massiveDamageTableUuid = getSetting(CONSTANTS.HIT_POINTS.SETTING.MASSIVE_DAMAGE_TABLE.KEY);
     return {
+      massiveDamageAnimation: getSetting(CONSTANTS.HIT_POINTS.SETTING.MASSIVE_DAMAGE_ANIMATION.KEY),
+      massiveDamageTableUuid,
+      massiveDamageTableName: await this._resolveTableName(massiveDamageTableUuid),
       levelUpHitPointsRerollMinimumValue: getSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.MINIMUM_VALUE.SETTING.KEY),
       levelUpHitPointsRerollOnce: getSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.ONCE.SETTING.KEY),
       levelUpHitPointsShowTakeAverage: getSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.SHOW_TAKE_AVERAGE.SETTING.KEY),
-      rollNpcHp: getSetting(CONSTANTS.HIT_POINTS.SETTING.ROLL_NPC_HP.KEY),
       applyBloodied: getSetting(CONSTANTS.BLOODIED.SETTING.APPLY_BLOODIED.KEY),
       removeBloodiedOnDead: getSetting(CONSTANTS.BLOODIED.SETTING.REMOVE_BLOODIED_ON_DEAD.KEY),
       bloodiedIcon: getSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_ICON.KEY),
@@ -80,6 +84,7 @@ export class GameplayForm extends CustomDnd5eForm {
       applyExhaustionOnCombatEnd: getSetting(CONSTANTS.EXHAUSTION.SETTING.APPLY_EXHAUSTION_ON_COMBAT_END.KEY),
       applyMassiveDamage: getSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_MASSIVE_DAMAGE.KEY),
       applyNegativeHp: getSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_NEGATIVE_HP.KEY),
+      applyNegativeHpNpc: getSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_NEGATIVE_HP_NPC.KEY),
       negativeHpHealFromZero: getSetting(CONSTANTS.HIT_POINTS.SETTING.NEGATIVE_HP_HEAL_FROM_ZERO.KEY),
       rerollInitiativeEachRound: getSetting(CONSTANTS.INITIATIVE.SETTING.REROLL_INITIATIVE_EACH_ROUND.KEY),
       awardInspirationD20Value: getSetting(CONSTANTS.INSPIRATION.SETTING.AWARD_INSPIRATION_DICE_VALUE.KEY),
@@ -114,9 +119,87 @@ export class GameplayForm extends CustomDnd5eForm {
             npc: "CUSTOM_DND5E.npcs",
             both: "CUSTOM_DND5E.both"
           }
+        },
+        rerollInitiativeEachRound: {
+          choices: {
+            off: "CUSTOM_DND5E.off",
+            rerollAll: "CUSTOM_DND5E.form.gameplay.initiative.rerollAll",
+            resetOnly: "CUSTOM_DND5E.form.gameplay.initiative.resetOnly",
+            rerollNpc: "CUSTOM_DND5E.form.gameplay.initiative.rerollNpc"
+          }
         }
       }
     };
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Resolve a RollTable name from its UUID.
+   *
+   * @param {string} uuid The RollTable UUID.
+   * @returns {Promise<string>} The table name, or empty string if not found.
+   */
+  async _resolveTableName(uuid) {
+    if ( !uuid ) return "";
+    const table = await fromUuid(uuid);
+    return table?.name ?? "";
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Handle rendering of the form.
+   *
+   * @param {object} context The context data.
+   * @param {object} options The rendering options.
+   */
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const dropZone = this.element.querySelector(".drop-area");
+    if ( dropZone ) {
+      dropZone.closest(".form-fields").addEventListener("drop", this._onDropTable.bind(this));
+    }
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Handle dropping a RollTable onto the form.
+   *
+   * @param {DragEvent} event The drop event.
+   */
+  async _onDropTable(event) {
+    event.preventDefault();
+    const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+    if ( data?.type !== "RollTable" ) return;
+    const table = await RollTable.implementation.fromDropData(data);
+    if ( !table ) return;
+
+    const input = this.element.querySelector('input[name="massiveDamageTableUuid"]');
+    if ( input ) input.value = table.uuid;
+
+    const dropArea = this.element.querySelector(".drop-area");
+    const fieldEl = this.element.querySelector(".massive-damage-table-field");
+    const nameEl = this.element.querySelector(".massive-damage-table-name");
+    if ( nameEl ) nameEl.textContent = table.name;
+    if ( fieldEl ) fieldEl.classList.remove("hidden");
+    if ( dropArea ) dropArea.classList.add("hidden");
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Clear the massive damage table selection.
+   */
+  static clearMassiveDamageTable() {
+    const input = this.element.querySelector('input[name="massiveDamageTableUuid"]');
+    if ( input ) input.value = "";
+
+    const dropArea = this.element.querySelector(".drop-area");
+    const fieldEl = this.element.querySelector(".massive-damage-table-field");
+    if ( fieldEl ) fieldEl.classList.add("hidden");
+    if ( dropArea ) dropArea.classList.remove("hidden");
   }
 
   /* -------------------------------------------- */
@@ -130,7 +213,6 @@ export class GameplayForm extends CustomDnd5eForm {
         resetSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.MINIMUM_VALUE.SETTING.KEY),
         resetSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.ONCE.SETTING.KEY),
         resetSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.SHOW_TAKE_AVERAGE.SETTING.KEY),
-        resetSetting(CONSTANTS.HIT_POINTS.SETTING.ROLL_NPC_HP.KEY),
         resetSetting(CONSTANTS.BLOODIED.SETTING.APPLY_BLOODIED.KEY),
         resetSetting(CONSTANTS.BLOODIED.SETTING.REMOVE_BLOODIED_ON_DEAD.KEY),
         resetSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_ICON.KEY),
@@ -146,6 +228,8 @@ export class GameplayForm extends CustomDnd5eForm {
         resetSetting(CONSTANTS.EXHAUSTION.SETTING.APPLY_EXHAUSTION_ON_ZERO_HP.KEY),
         resetSetting(CONSTANTS.EXHAUSTION.SETTING.APPLY_EXHAUSTION_ON_COMBAT_END.KEY),
         resetSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_MASSIVE_DAMAGE.KEY),
+        resetSetting(CONSTANTS.HIT_POINTS.SETTING.MASSIVE_DAMAGE_ANIMATION.KEY),
+        resetSetting(CONSTANTS.HIT_POINTS.SETTING.MASSIVE_DAMAGE_TABLE.KEY),
         resetSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_NEGATIVE_HP.KEY),
         resetSetting(CONSTANTS.HIT_POINTS.SETTING.NEGATIVE_HP_HEAL_FROM_ZERO.KEY),
         resetSetting(CONSTANTS.INITIATIVE.SETTING.REROLL_INITIATIVE_EACH_ROUND.KEY),
@@ -208,7 +292,6 @@ export class GameplayForm extends CustomDnd5eForm {
       setSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.REROLL.ONCE.SETTING.KEY, formData.object.levelUpHitPointsRerollOnce),
       setSetting(CONSTANTS.LEVEL_UP.HIT_POINTS.SHOW_TAKE_AVERAGE.SETTING.KEY,
         formData.object.levelUpHitPointsShowTakeAverage),
-      setSetting(CONSTANTS.HIT_POINTS.SETTING.ROLL_NPC_HP.KEY, formData.object.rollNpcHp),
       setSetting(CONSTANTS.BLOODIED.SETTING.APPLY_BLOODIED.KEY, formData.object.applyBloodied),
       setSetting(CONSTANTS.BLOODIED.SETTING.REMOVE_BLOODIED_ON_DEAD.KEY, formData.object.removeBloodiedOnDead),
       setSetting(CONSTANTS.BLOODIED.SETTING.BLOODIED_ICON.KEY, formData.object.bloodiedIcon),
@@ -225,7 +308,10 @@ export class GameplayForm extends CustomDnd5eForm {
       setSetting(CONSTANTS.EXHAUSTION.SETTING.APPLY_EXHAUSTION_ON_COMBAT_END.KEY,
         formData.object.applyExhaustionOnCombatEnd),
       setSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_MASSIVE_DAMAGE.KEY, formData.object.applyMassiveDamage),
+      setSetting(CONSTANTS.HIT_POINTS.SETTING.MASSIVE_DAMAGE_ANIMATION.KEY, formData.object.massiveDamageAnimation),
+      setSetting(CONSTANTS.HIT_POINTS.SETTING.MASSIVE_DAMAGE_TABLE.KEY, formData.object.massiveDamageTableUuid),
       setSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_NEGATIVE_HP.KEY, formData.object.applyNegativeHp),
+      setSetting(CONSTANTS.HIT_POINTS.SETTING.APPLY_NEGATIVE_HP_NPC.KEY, formData.object.applyNegativeHpNpc),
       setSetting(CONSTANTS.HIT_POINTS.SETTING.NEGATIVE_HP_HEAL_FROM_ZERO.KEY, formData.object.negativeHpHealFromZero),
       setSetting(CONSTANTS.INITIATIVE.SETTING.REROLL_INITIATIVE_EACH_ROUND.KEY,
         formData.object.rerollInitiativeEachRound),

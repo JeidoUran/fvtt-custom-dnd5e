@@ -8,10 +8,10 @@ import {
   getDefaultDnd5eConfig,
   resetDnd5eConfig,
   resetSetting } from "../utils.js";
-import { DamageTypesForm } from "../forms/config-form.js";
+import { WeaponMasteriesForm } from "../forms/config-form.js";
 
-const constants = CONSTANTS.DAMAGE_TYPES;
-const configKey = "damageTypes";
+const constants = CONSTANTS.WEAPON_MASTERIES;
+const configKey = "weaponMasteries";
 
 /**
  * Register settings and load templates.
@@ -38,7 +38,7 @@ function registerSettings() {
       label: game.i18n.localize(constants.MENU.LABEL),
       name: game.i18n.localize(constants.MENU.NAME),
       icon: constants.MENU.ICON,
-      type: DamageTypesForm,
+      type: WeaponMasteriesForm,
       restricted: true,
       scope: "world"
     }
@@ -60,8 +60,9 @@ function registerSettings() {
     {
       scope: "world",
       config: false,
+      requiresReload: true,
       type: Object,
-      default: CONFIG.CUSTOM_DND5E[configKey]
+      default: getSettingDefault()
     }
   );
 }
@@ -71,7 +72,7 @@ function registerSettings() {
 /**
  * Get default config.
  * @param {string|null} key The key
- * @returns {object} The config data
+ * @returns {object} The config
  */
 export function getSettingDefault(key = null) {
   return getDefaultDnd5eConfig(configKey, key);
@@ -90,7 +91,7 @@ export async function resetConfigSetting() {
 /* -------------------------------------------- */
 
 /**
- * Set CONFIG.DND5E.damageTypes.
+ * Set CONFIG.DND5E.weaponMasteries
  * @param {object} [settingData=null] The setting data
  * @returns {void}
  */
@@ -106,7 +107,7 @@ export function setConfig(settingData = null) {
 
   const configData = buildConfig(mergedSettingData);
 
-  Hooks.callAll("customDnd5e.setDamageTypesConfig", configData);
+  Hooks.callAll("customDnd5e.setWeaponMasteriesConfig", configData);
 
   if ( configData ) {
     CONFIG.DND5E[configKey] = configData;
@@ -148,11 +149,7 @@ function buildConfig(settingData) {
  */
 function buildConfigEntry(data) {
   return {
-    color: Color.fromString(data.color || "#ffffff"),
-    icon: data.icon,
-    ...(data.isPhysical !== undefined && { isPhysical: data.isPhysical }),
     label: game.i18n.localize(data.label),
     reference: data.reference
   };
 }
-

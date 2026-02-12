@@ -186,7 +186,7 @@ export const CONSTANTS = {
     MENU: {
       KEY: "bastions-menu",
       HINT: "CUSTOM_DND5E.menu.bastions.hint",
-      ICON: "fas fa-fort",
+      ICON: "fas fa-chess-rook",
       LABEL: "CUSTOM_DND5E.menu.bastions.label",
       NAME: "CUSTOM_DND5E.menu.bastions.name"
     },
@@ -245,6 +245,34 @@ export const CONSTANTS = {
     ICON: "modules/custom-dnd5e/media/icons/bloodied.svg",
     CONDITION_UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.ngr8w6WBycK59brj.JournalEntryPage.sV0ZCKxwh4n4ZU1P",
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.GjOBdXwapcYvUihc"
+  },
+  CALENDAR: {
+    ID: "calendar",
+    MENU: {
+      KEY: "calendar-menu",
+      HINT: "CUSTOM_DND5E.menu.calendars.hint",
+      ICON: "fas fa-calendar-days",
+      LABEL: "CUSTOM_DND5E.menu.calendars.label",
+      NAME: "CUSTOM_DND5E.menu.calendars.name"
+    },
+    SETTING: {
+      ENABLE: {
+        KEY: "enable-calendar"
+      },
+      CONFIG: {
+        KEY: "calendar"
+      }
+    },
+    TEMPLATE: {
+      FORM: "modules/custom-dnd5e/templates/calendar/calendar-form.hbs",
+      LIST: "modules/custom-dnd5e/templates/calendar/calendar-list.hbs",
+      EDIT: "modules/custom-dnd5e/templates/calendar/calendar-edit-form.hbs",
+      MONTHS_LIST: "modules/custom-dnd5e/templates/calendar/calendar-months-list.hbs",
+      DAYS_LIST: "modules/custom-dnd5e/templates/calendar/calendar-days-list.hbs",
+      SEASONS_LIST: "modules/custom-dnd5e/templates/calendar/calendar-seasons-list.hbs",
+      FESTIVALS_LIST: "modules/custom-dnd5e/templates/calendar/calendar-festivals-list.hbs"
+    },
+    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.cR8kYmNpV3tZbW5d"
   },
   CHAT_COMMANDS: {
     SETTING: {
@@ -473,6 +501,31 @@ export const CONSTANTS = {
         KEY: "unequipped-item-weight-modifier"
       }
     },
+    SPEED_REDUCTION_MODE: {
+      SETTING: {
+        KEY: "speed-reduction-mode"
+      }
+    },
+    SPEED_REDUCTION_MULTIPLIER_ENCUMBERED: {
+      SETTING: {
+        KEY: "speed-reduction-multiplier-encumbered"
+      }
+    },
+    SPEED_REDUCTION_MULTIPLIER_HEAVILY_ENCUMBERED: {
+      SETTING: {
+        KEY: "speed-reduction-multiplier-heavily-encumbered"
+      }
+    },
+    SPEED_REDUCTION_MULTIPLIER_EXCEEDING_CARRYING_CAPACITY: {
+      SETTING: {
+        KEY: "speed-reduction-multiplier-exceeding-carrying-capacity"
+      }
+    },
+    SPEED_REDUCTION_MULTIPLIER_ROUNDING: {
+      SETTING: {
+        KEY: "speed-reduction-multiplier-rounding"
+      }
+    },
     ID: "encumbrance",
     MENU: {
       KEY: "encumbrance-menu",
@@ -553,14 +606,20 @@ export const CONSTANTS = {
       APPLY_MASSIVE_DAMAGE: {
         KEY: "apply-massive-damage"
       },
+      MASSIVE_DAMAGE_ANIMATION: {
+        KEY: "massive-damage-animation"
+      },
+      MASSIVE_DAMAGE_TABLE: {
+        KEY: "massive-damage-table"
+      },
       APPLY_NEGATIVE_HP: {
         KEY: "apply-negative-hp"
       },
+      APPLY_NEGATIVE_HP_NPC: {
+        KEY: "apply-negative-hp-npc"
+      },
       NEGATIVE_HP_HEAL_FROM_ZERO: {
         KEY: "negative-hp-heal-from-zero"
-      },
-      ROLL_NPC_HP: {
-        KEY: "roll-npc-hp"
       }
     }
   },
@@ -1066,6 +1125,30 @@ export const CONSTANTS = {
       LIST: "modules/custom-dnd5e/templates/config-edit-in-list.hbs"
     },
     UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.Cy09wdPVi8XrkjJ2"
+  },
+  WEAPON_MASTERIES: {
+    ID: "weapon-masteries",
+    MENU: {
+      KEY: "weapon-masteries-menu",
+      HINT: "CUSTOM_DND5E.menu.weaponMasteries.hint",
+      ICON: "fas fa-hand-fist",
+      LABEL: "CUSTOM_DND5E.menu.weaponMasteries.label",
+      NAME: "CUSTOM_DND5E.menu.weaponMasteries.name"
+    },
+    SETTING: {
+      ENABLE: {
+        KEY: "enable-weapon-masteries"
+      },
+      CONFIG: {
+        KEY: "weapon-masteries"
+      }
+    },
+    TEMPLATE: {
+      EDIT: "modules/custom-dnd5e/templates/weapon-masteries-edit.hbs",
+      FORM: "modules/custom-dnd5e/templates/config-form.hbs",
+      LIST: "modules/custom-dnd5e/templates/config-list.hbs"
+    },
+    UUID: "Compendium.custom-dnd5e.custom-dnd5e-journals.JournalEntry.B48iqFBddUikMMer.JournalEntryPage.wM3kTpNxR7vYhD9c"
   }
 };
 

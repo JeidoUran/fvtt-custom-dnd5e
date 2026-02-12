@@ -20,10 +20,28 @@ const configKey = "conditionTypes";
 export function register() {
   registerSettings();
 
+  Hooks.on("preCreateActiveEffect", applyOverlay);
+
   const templates = [
     constants.TEMPLATE.EDIT
   ];
   c5eLoadTemplates(templates);
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Apply overlay flag to active effects for conditions configured as overlays.
+ * @param {ActiveEffect} effect The active effect being created.
+ */
+function applyOverlay(effect) {
+  if ( !getSetting(constants.SETTING.ENABLE.KEY) ) return;
+  const statusId = [...(effect.statuses || [])][0];
+  if ( !statusId ) return;
+  const statusEffect = CONFIG.statusEffects.find(e => e.id === statusId);
+  if ( statusEffect?.overlay ) {
+    effect.updateSource({ "flags.core.overlay": true });
+  }
 }
 
 /* -------------------------------------------- */
@@ -120,6 +138,24 @@ export async function resetConfigSetting() {
 /* -------------------------------------------- */
 
 /**
+ * Merge data with CONFIG and setting defaults to include conditions from other modules.
+ * @param {object} data The setting data
+ * @returns {object} The merged data
+ */
+export function mergeConfig(data) {
+  const conditionTypes = foundry.utils.deepClone(CONFIG.DND5E.conditionTypes);
+  Object.values(conditionTypes).forEach(v => { if ( !v.pseudo ) v.sheet = true; });
+  data = foundry.utils.mergeObject(data, conditionTypes, { overwrite: false });
+  CONFIG.statusEffects.forEach(e => {
+    if ( data[e.id] ) foundry.utils.mergeObject(data[e.id], e, { overwrite: false });
+  });
+  data = foundry.utils.mergeObject(data, getSettingDefault(), { overwrite: false });
+  return data;
+}
+
+/* -------------------------------------------- */
+
+/**
  * Build setting data.
  * @param {object} config The config data
  * @returns {object} The setting data
@@ -194,6 +230,8 @@ export function setConfig(data = null) {
     return;
   }
 
+  data = mergeConfig(data);
+
   // Initialise the config object
   const config = {
     conditionTypes: {},
@@ -211,7 +249,7 @@ export function setConfig(data = null) {
 
       if ( value.sheet || value.pseudo ) {
         config.conditionTypes[key] = {
-          img: value?.img ?? value?.icon,
+          img: value?.img ?? value?.icon ?? "icons/svg/hazard.svg",
           name: localisedName,
           ...(value.levels && { levels: value.levels }),
           ...(value.pseudo && { pseudo: value.pseudo }),
@@ -229,12 +267,13 @@ export function setConfig(data = null) {
         ...(value.coverBonus !== undefined && { coverBonus: value.coverBonus }),
         ...(value.exclusiveGroup !== undefined && { exclusiveGroup: value.exclusiveGroup }),
         id: key,
-        img: value?.img ?? value?.icon,
+        img: value?.img ?? value?.icon ?? "icons/svg/hazard.svg",
         ...(value.levels !== undefined && { levels: value.levels }),
         name: localisedName,
         ...(value.order !== undefined && { order: value.order }),
         ...(value.pseudo && { pseudo: value.pseudo }),
         ...(value.reference !== undefined && { reference: value.reference }),
+        ...(value.overlay && { overlay: value.overlay }),
         ...(value.riders !== undefined && { riders: value.riders }),
         ...(value.statuses !== undefined && { statuses: value.statuses })
       });

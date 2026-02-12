@@ -10,6 +10,7 @@ import { register as registerArmorIds, setConfig as setArmorIds } from "./config
 import { register as registerArmorProficiencies, setConfig as setArmorProficiencies } from "./configurations/armor-proficiencies.js";
 import { register as registerBastions, setConfig as setBastions } from "./configurations/bastions.js";
 import { register as registerBloodied, setConfig as setBloodied, addBloodiedCondition } from "./configurations/bloodied.js";
+import { register as registerCalendar } from "./configurations/calendar.js";
 import { register as registerCampSupplies } from "./gameplay/camp-supplies.js";
 import { register as registerConditions, registerMenu as registerConditionsMenu, setConfig as setConditions } from "./configurations/conditions.js";
 import { register as registerConsumableTypes, setConfig as setConsumableTypes } from "./configurations/consumable-types.js";
@@ -30,7 +31,7 @@ import {
   increaseFailure,
   decreaseFailure,
   modifyFailure
-} from "./counters.js";
+} from "./counters/counters.js";
 import { register as registerCreatureTypes, setConfig as setCreatureTypes } from "./configurations/creature-types.js";
 import { register as registerCurrency, setConfig as setCurrency } from "./configurations/currency.js";
 import { register as registerDamageTypes, setConfig as setDamageTypes } from "./configurations/damage-types.js";
@@ -53,28 +54,49 @@ import { register as registerSenses, setConfig as setSenses } from "./configurat
 import { register as registerSkills, setConfig as setSkills } from "./configurations/skills.js";
 import { register as registerSpellSchools, setConfig as setSpellSchools } from "./configurations/spell-schools.js";
 import { register as registerRadialStatusEffects } from "./radial-status-effects.js";
+import { register as registerTidy5eCounters } from "./counters/counters-tidy5e.js";
 import { register as registerTokenBorder } from "./token-border.js";
 import { register as registerTokenEffects } from "./token-effects.js";
 import { register as registerTools, setConfig as setTools } from "./configurations/tools.js";
 import { register as registerToolProficiencies, setConfig as setToolProficiencies } from "./configurations/tool-proficiencies.js";
 import { register as registerWeaponIds, setConfig as setWeaponIds } from "./configurations/weapon-ids.js";
+import { register as registerWeaponMasteries, setConfig as setWeaponMasteries } from "./configurations/weapon-masteries.js";
 import { register as registerWeaponProficiencies, setConfig as setWeaponProficiencies } from "./configurations/weapon-proficiencies.js";
-import { patchModifyTokenAttribute } from "./patches/actor-modify-token-attribute.js";
 import { patchD20Die } from "./patches/d20-die.js";
 import { patchD20Roll } from "./patches/d20-roll.js";
 import { patchPrepareEncumbrance } from "./patches/prepare-encumbrance.js";
+import { patchPrepareMovement } from "./patches/prepare-movement.js";
 import { patchPrepareSenses } from "./patches/prepare-senses.js";
 import { registerCharacterSheet } from "./sheets/character-sheet.js";
+
+/**
+ * Clone specific CONFIG.DND5E properties to CONFIG.CUSTOM_DND5E.
+ */
+function cloneDnd5eConfig() {
+  CONFIG.CUSTOM_DND5E = {};
+  const propertiesToClone = [
+    "abilities", "abilityActivationTypes", "activityActivationTypes", "actorSizes",
+    "armorClasses", "armorIds", "armorProficiencies", "armorProficienciesMap", "armorTypes",
+    "bloodied", "conditionTypes", "consumableTypes", "creatureTypes", "currencies",
+    "damageTypes", "encumbrance", "facilities", "featureTypes",
+    "itemActionTypes", "itemProperties", "itemRarity", "languages", "lootTypes",
+    "maxAbilityScore", "maxLevel", "miscEquipmentTypes", "senses", "skills",
+    "spellSchools", "toolProficiencies", "toolTypes", "tools",
+    "validProperties", "weaponIds", "weaponMasteries", "weaponProficiencies",
+    "weaponProficienciesMap", "weaponProperties", "weaponTypes"
+  ];
+  for ( const key of propertiesToClone ) {
+    if ( key in CONFIG.DND5E ) {
+      CONFIG.CUSTOM_DND5E[key] = foundry.utils.deepClone(CONFIG.DND5E[key]);
+    }
+  }
+}
 
 /**
  * Initialize the module and register settings, hooks, and templates.
  */
 Hooks.on("init", async () => {
-  // Suppress deprecation warnings during deep clone
-  const originalWarn = console.warn;
-  console.warn = () => {};
-  CONFIG.CUSTOM_DND5E = foundry.utils.deepClone(CONFIG.DND5E);
-  console.warn = originalWarn;
+  cloneDnd5eConfig();
 
   const module = game.modules.get(MODULE.ID);
   module.api = {
@@ -107,10 +129,10 @@ Hooks.on("init", async () => {
     }
   );
 
-  patchModifyTokenAttribute();
   patchD20Die();
   patchD20Roll();
   patchPrepareEncumbrance();
+  patchPrepareMovement();
   patchPrepareSenses();
 
   registerMigration();
@@ -126,10 +148,12 @@ Hooks.on("init", async () => {
   registerArmorProficiencies();
   registerBastions();
   registerBloodied();
+  registerCalendar();
   registerCampSupplies();
   registerConditionsMenu();
   registerConsumableTypes();
   registerCounters();
+  registerTidy5eCounters();
   registerCreatureTypes();
   registerCurrency();
   registerDamageTypes();
@@ -151,6 +175,7 @@ Hooks.on("init", async () => {
   registerTools();
   registerToolProficiencies();
   registerWeaponIds();
+  registerWeaponMasteries();
   registerWeaponProficiencies();
   registerMisc();
   registerRadialStatusEffects();
@@ -238,6 +263,7 @@ Hooks.on("ready", async () => {
   setTools(getSetting(CONSTANTS.TOOLS.SETTING.CONFIG.KEY));
   setToolProficiencies(getSetting(CONSTANTS.TOOL_PROFICIENCIES.SETTING.CONFIG.KEY));
   setWeaponIds(getSetting(CONSTANTS.WEAPON_IDS.SETTING.CONFIG.KEY));
+  setWeaponMasteries(getSetting(CONSTANTS.WEAPON_MASTERIES.SETTING.CONFIG.KEY));
   setWeaponProficiencies(getSetting(CONSTANTS.WEAPON_PROFICIENCIES.SETTING.CONFIG.KEY));
   setMaxLevel(getSetting(CONSTANTS.MAX_LEVEL.SETTING.KEY));
 

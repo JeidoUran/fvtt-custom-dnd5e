@@ -1,5 +1,5 @@
 import { CONSTANTS, MODULE, SETTING_BY_ENTITY_TYPE, SHEET_TYPE } from "../constants.js";
-import { c5eLoadTemplates, checkEmpty, getFlag, setFlag, unsetFlag, getSetting, registerMenu, registerSetting, makeDead } from "../utils.js";
+import { c5eLoadTemplates, checkEmpty, getFlag, setFlag, unsetFlag, getSetting, registerMenu, registerSetting, makeDead, Logger } from "../utils.js";
 import { CountersForm } from "../forms/counters-form.js";
 import { CountersFormIndividual } from "../forms/counters-form-individual.js";
 
@@ -64,14 +64,118 @@ function registerSettings() {
  * Register hooks.
  */
 function registerHooks() {
+  registerItemSheetTab();
+  registerGroupSheetTab();
   Hooks.on("renderActorSheetV2", addCounters);
-  Hooks.on("renderInnerItemSheet", addCounters);
+  Hooks.on("renderItemSheet5e", addItemCounters);
+  Hooks.on("renderGroupActorSheet", addGroupCounters);
+  Hooks.on("dnd5e.prepareSheetContext", prepareCountersContext);
   Hooks.on("preUpdateActor", handlePreUpdateActor);
   Hooks.on("updateActor", handleUpdateActor);
+  Hooks.on("updateItem", handleUpdateItem);
   Hooks.on("deleteCombat", handleDeleteCombat);
   Hooks.on("combatStart", handleCombatStart);
   Hooks.on("updateCombat", handleUpdateCombat);
   Hooks.on("dnd5e.preRestCompleted", handleRest);
+  Hooks.on("dnd5e.rollAttack", handleRollAttack);
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Register the counters tab on the item sheet.
+ */
+function registerItemSheetTab() {
+  const ItemSheet5e = dnd5e.applications.item.ItemSheet5e;
+  if ( !ItemSheet5e.TABS.find(t => t.tab === "counters") ) {
+    ItemSheet5e.TABS.push({
+      tab: "counters",
+      label: "CUSTOM_DND5E.counters"
+    });
+  }
+  ItemSheet5e.PARTS.counters = {
+    tab: "counters",
+    template: constants.TEMPLATE.DND5E_ITEM_GROUP,
+    scrollable: [""]
+  };
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Register the counters tab on the group actor sheet.
+ */
+function registerGroupSheetTab() {
+  const GroupActorSheet = dnd5e.applications.actor.GroupActorSheet;
+  if ( !GroupActorSheet.TABS.find(t => t.tab === "counters") ) {
+    GroupActorSheet.TABS.push({
+      tab: "counters",
+      label: "CUSTOM_DND5E.counters",
+      icon: "fas fa-tally"
+    });
+  }
+  GroupActorSheet.PARTS.counters = {
+    tab: "counters",
+    container: { classes: ["tab-body"], id: "tabs" },
+    template: constants.TEMPLATE.DND5E_ITEM_GROUP,
+    scrollable: [""]
+  };
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Prepare counter data for the counters sheet part.
+ * @param {object} sheet The sheet
+ * @param {string} partId The part ID
+ * @param {object} context The context
+ * @param {object} options The options
+ */
+function prepareCountersContext(sheet, partId, context, options) {
+  if ( partId !== "counters" ) return;
+  const docName = sheet.document?.documentName;
+  if ( docName === "Item" ) {
+    context.counters = mergeCounters(sheet.document, CONSTANTS.COUNTERS.SETTING.ITEM_COUNTERS.KEY);
+  } else if ( docName === "Actor" && sheet.document?.type === "group" ) {
+    context.counters = mergeCounters(sheet.document, CONSTANTS.COUNTERS.SETTING.GROUP_COUNTERS.KEY);
+  } else {
+    return;
+  }
+  context.editable = sheet.isEditable;
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Set up counter interactions on the item sheet.
+ * @param {object} app The app
+ * @param {object} html The HTML
+ * @param {object} data The data
+ */
+function addItemCounters(app, html, data) {
+  if ( !getSetting(constants.SETTING.COUNTERS.KEY) ) return;
+  const container = html.querySelector("#custom-dnd5e-counters");
+  if ( !container ) return;
+  const settingKey = CONSTANTS.COUNTERS.SETTING.ITEM_COUNTERS.KEY;
+  const counters = mergeCounters(app.document, settingKey);
+  setupCounterInteractions(app.document, counters, container, app.isEditable);
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Set up counter interactions on the group actor sheet.
+ * @param {object} app The app
+ * @param {object} html The HTML
+ * @param {object} data The data
+ */
+function addGroupCounters(app, html, data) {
+  if ( !getSetting(constants.SETTING.COUNTERS.KEY) ) return;
+  const container = html.querySelector("#custom-dnd5e-counters");
+  if ( !container ) return;
+  const settingKey = CONSTANTS.COUNTERS.SETTING.GROUP_COUNTERS.KEY;
+  const counters = mergeCounters(app.document, settingKey);
+  setupCounterInteractions(app.document, counters, container, app.isEditable);
 }
 
 /* -------------------------------------------- */
@@ -109,7 +213,34 @@ function handleUpdateActor(actor, data, options, userId) {
   if ( !actor.isOwner ) return;
   const hp = foundry.utils.getProperty(data, "system.attributes.hp.value");
   if ( hp === 0 ) processTriggers({ actor, triggerType: "zeroHp", followUpFlag: "zeroHpCombatEnd" });
-  if ( hasDataChanged(data) ) processTriggers({ actor, data, triggerType: "counterValue" });
+  if ( hasDataChanged(data) ) {
+    processTriggers({ actor, data, triggerType: "counterValue" });
+    processTriggers({ actor, data, triggerType: "successValue" });
+    processTriggers({ actor, data, triggerType: "failureValue" });
+    processTriggers({ actor, data, triggerType: "checked" });
+    processTriggers({ actor, data, triggerType: "unchecked" });
+  }
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Handle item update triggers.
+ * @param {object} item The item
+ * @param {object} data The data
+ * @param {object} options The options
+ * @param {string} userId The user ID
+ */
+function handleUpdateItem(item, data, options, userId) {
+  if ( !getSetting(constants.SETTING.COUNTERS.KEY) ) return;
+  if ( !item.isOwner ) return;
+  if ( hasDataChanged(data) ) {
+    processTriggers({ actor: item, data, triggerType: "counterValue" });
+    processTriggers({ actor: item, data, triggerType: "successValue" });
+    processTriggers({ actor: item, data, triggerType: "failureValue" });
+    processTriggers({ actor: item, data, triggerType: "checked" });
+    processTriggers({ actor: item, data, triggerType: "unchecked" });
+  }
 }
 
 /* -------------------------------------------- */
@@ -181,6 +312,27 @@ function handleRest(actor, data) {
 /* -------------------------------------------- */
 
 /**
+ * Handle attack roll triggers.
+ * @param {object[]} rolls The rolls
+ * @param {object} data The data
+ */
+function handleRollAttack(rolls, data) {
+  if ( !getSetting(constants.SETTING.COUNTERS.KEY) ) return;
+  const actor = data.subject?.actor;
+  if ( !actor?.isOwner ) return;
+  const dieTotal = rolls[0]?.terms[0]?.total;
+  if ( dieTotal !== undefined ) {
+    processTriggers({ actor, triggerType: "rollAttack", dieTotal });
+    const item = data.subject?.item;
+    if ( item ) {
+      processTriggers({ actor: item, triggerType: "rollAttack", dieTotal });
+    }
+  }
+}
+
+/* -------------------------------------------- */
+
+/**
  * Whether the counter's value has changed.
  * @param {object} data The data
  * @returns {boolean} Whether the counter's value has changed
@@ -200,7 +352,7 @@ function hasDataChanged(data) {
  * @param {string} params.triggerType The trigger type, e.g., 'zeroHp', 'halfHp', 'longRest'
  * @param {string} [params.followUpFlag=null] Optional: flag to set for follow-up actions (e.g., 'zeroHpCombatEnd')
  */
-function processTriggers({ actor, data = null, triggerType, followUpFlag = null }) {
+function processTriggers({ actor, data = null, triggerType, followUpFlag = null, dieTotal = null }) {
   const counters = getCounters(actor);
   if ( !counters ) return;
 
@@ -209,7 +361,7 @@ function processTriggers({ actor, data = null, triggerType, followUpFlag = null 
     if ( !counter.triggers ) continue;
     for (const trigger of counter.triggers) {
       if ( trigger.trigger === triggerType ) {
-        handleAction(counterKey, counter, trigger, { actor, data });
+        handleAction(counterKey, counter, trigger, { actor, data, dieTotal });
       }
     }
   }
@@ -231,7 +383,31 @@ function processTriggers({ actor, data = null, triggerType, followUpFlag = null 
  * @param {Actor} params.actor The actor
  * @param {object} [params.data=null] The data
  */
-function handleAction(counterKey, counter, trigger, { actor, data }) {
+function handleAction(counterKey, counter, trigger, { actor, data, dieTotal = null }) {
+  // For rollAttack, compare die value using operator
+  if ( trigger.trigger === "rollAttack" ) {
+    if ( !compareValues(dieTotal, trigger.triggerOperator, Number(trigger.triggerValue)) ) return;
+  }
+
+  // For counterValue/successValue/failureValue, compare using operator
+  const valueTriggerMap = {
+    counterValue: () => getCounterValue(data, counterKey),
+    successValue: () => getSuccessFailureValue(data, counterKey, "success"),
+    failureValue: () => getSuccessFailureValue(data, counterKey, "failure")
+  };
+
+  if ( valueTriggerMap[trigger.trigger] ) {
+    const value = valueTriggerMap[trigger.trigger]();
+    if ( value === null || value === undefined ) return;
+    const target = resolveTriggerValue(actor, trigger.triggerValue);
+    if ( target === null || target === undefined ) return;
+    if ( !compareValues(value, trigger.triggerOperator, target) ) return;
+  }
+
+  // For checked/unchecked, only fire if counter value matches
+  if ( trigger.trigger === "checked" && getCounterValue(data, counterKey) !== true ) return;
+  if ( trigger.trigger === "unchecked" && getCounterValue(data, counterKey) !== false ) return;
+
   switch (trigger.action) {
     case "check":
       checkCheckbox(actor, counterKey);
@@ -248,15 +424,75 @@ function handleAction(counterKey, counter, trigger, { actor, data }) {
     case "set":
       setCounter(actor, counterKey, trigger, counter.type);
       break;
-    case "dead":
-      {
-        const counterValue = getCounterValue(data, counterKey);
-        if ( counterValue >= trigger.triggerValue ) {
-          makeDead(actor);
-        }
-      }
+    case "dead": {
+      const deadActor = (actor.documentName === "Item") ? actor.actor : actor;
+      if ( deadActor ) makeDead(deadActor);
+      break;
+    }
+    case "destroy":
+      destroyItem(actor);
+      break;
+    case "reduceQuantity":
+      reduceItemQuantity(actor);
+      break;
+    case "macro":
+      executeMacro(actor, counterKey, trigger, data);
       break;
   }
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Destroy an item.
+ * @param {Item} item The item to destroy
+ */
+async function destroyItem(item) {
+  if ( item.documentName !== "Item" ) return;
+  await item.delete();
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Reduce an item's quantity by 1.
+ * @param {Item} item The item
+ */
+async function reduceItemQuantity(item) {
+  if ( item.documentName !== "Item" ) return;
+  const quantity = item.system.quantity ?? 0;
+  await item.update({ "system.quantity": Math.max(quantity - 1, 0) });
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Execute a macro from a trigger.
+ * @param {Actor|Item} entity The actor or item
+ * @param {string} counterKey The counter key
+ * @param {object} trigger The trigger
+ * @param {object} data The update data
+ */
+async function executeMacro(entity, counterKey, trigger, data) {
+  if ( !trigger.macroUuid ) return;
+  const macro = await fromUuid(trigger.macroUuid);
+  if ( !macro ) {
+    Logger.error(`Macro not found: ${trigger.macroUuid}`, true);
+    return;
+  }
+  const isItem = entity.documentName === "Item";
+  const actor = isItem ? entity.actor : entity;
+  const token = actor?.isToken ? actor.token : actor?.getActiveTokens()[0];
+  const counterValue = data ? getCounterValue(data, counterKey) : null;
+  macro.execute({
+    actor,
+    token,
+    item: isItem ? entity : null,
+    counter: counterKey,
+    counterValue,
+    trigger: trigger.trigger,
+    triggerValue: trigger.triggerValue
+  });
 }
 
 /* -------------------------------------------- */
@@ -274,6 +510,7 @@ function increaseCounter(actor, key, trigger, type) {
       increaseFraction(actor, key, trigger.actionValue);
       break;
     case "number":
+    case "pips":
       increaseNumber(actor, key, trigger.actionValue);
       break;
   }
@@ -294,6 +531,7 @@ function decreaseCounter(actor, key, trigger, type) {
       decreaseFraction(actor, key, trigger.actionValue);
       break;
     case "number":
+    case "pips":
       decreaseNumber(actor, key, trigger.actionValue);
       break;
   }
@@ -312,6 +550,7 @@ function setCounter(actor, key, trigger, type) {
       setFraction(actor, key, trigger.actionValue);
       break;
     case "number":
+    case "pips":
       setNumber(actor, key, trigger.actionValue);
       break;
   }
@@ -326,7 +565,44 @@ function setCounter(actor, key, trigger, type) {
  * @returns {number|null} The counter value
  */
 function getCounterValue(data, counterKey) {
-  return data.flags[MODULE.ID][counterKey]?.value ?? data.flags[MODULE.ID][counterKey] ?? null;
+  const key = counterKey.startsWith("counters.") ? counterKey.slice(9) : counterKey;
+  return data.flags[MODULE.ID][key]?.value ?? data.flags[MODULE.ID][key] ?? null;
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Get the success or failure value of a success/failure counter.
+ * @param {object} data The data
+ * @param {string} counterKey The counter key
+ * @param {string} property The property: "success" or "failure"
+ * @returns {number|null} The value
+ */
+function getSuccessFailureValue(data, counterKey, property) {
+  const key = counterKey.startsWith("counters.") ? counterKey.slice(9) : counterKey;
+  return data.flags[MODULE.ID][key]?.[property] ?? null;
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Compare a value against a target using the given operator.
+ * @param {number} value The current value
+ * @param {string} operator The operator: "eq", "lt", "gt", "neq"
+ * @param {number} target The target value
+ * @returns {boolean} Whether the comparison is true
+ */
+function compareValues(value, operator, target) {
+  const a = Number(value);
+  const b = Number(target);
+  if ( isNaN(a) || isNaN(b) ) return false;
+  switch (operator) {
+    case "lt": return a < b;
+    case "gt": return a > b;
+    case "neq": return a !== b;
+    case "eq":
+    default: return a === b;
+  }
 }
 
 /* -------------------------------------------- */
@@ -390,15 +666,23 @@ function processCounters(type, counters, entity) {
   return Object.entries(foundry.utils.deepClone(counters))
     .filter(([_, counter]) => counter.visible && game.user.role >= (counter.viewRole ?? 1))
     .reduce((acc, [key, counter]) => {
-      counter.property = (type === "entity" && ["checkbox", "number"].includes(counter.type)) ? `${key}.value` : key;
+      counter.property = (type === "entity" && ["checkbox", "number", "pips"].includes(counter.type)) ? `${key}.value` : key;
       counter.canEdit = (!counter.editRole || game.user.role >= counter.editRole);
-      if ( ["checkbox", "number"].includes(counter.type) ) {
+      if ( ["checkbox", "number", "pips"].includes(counter.type) ) {
         counter.value = entity.getFlag(MODULE.ID, counter.property);
+      }
+      if ( counter.type === "pips" ) {
+        counter.max = resolveMax(entity, counter.max) ?? entity.getFlag(MODULE.ID, `${key}.max`) ?? 0;
+        counter.pips = Array.fromRange(counter.max, 1).map(n => ({
+          n,
+          filled: (counter.value ?? 0) >= n,
+          canEdit: counter.canEdit
+        }));
       }
       if ( counter.type === "fraction" ) {
         counter.value = entity.getFlag(MODULE.ID, `${key}.value`) ?? 0;
         counter.canEditMax = (!counter.max && counter.canEdit);
-        counter.max = counter.max ?? entity.getFlag(MODULE.ID, `${key}.max`) ?? 0;
+        counter.max = resolveMax(entity, counter.max) ?? entity.getFlag(MODULE.ID, `${key}.max`) ?? 0;
       }
       if ( counter.type === "successFailure" ) {
         counter.success = entity.getFlag(MODULE.ID, `${key}.success`) ?? 0;
@@ -418,11 +702,22 @@ function processCounters(type, counters, entity) {
  */
 function renderCountersTab(sheetType, html) {
   if ( sheetType.group || sheetType.item ) {
-    const nav = html.querySelector("nav.sheet-navigation.tabs");
+    const nav = html.querySelector("nav.sheet-tabs.tabs") ?? html.querySelector("nav.sheet-navigation.tabs");
+    if ( !nav ) return;
+    const existingTab = nav.querySelector("[data-tab='custom-dnd5e-counters']");
+    if ( existingTab ) return;
     const navItem = document.createElement("a");
-    navItem.classList.add("item");
     navItem.setAttribute("data-tab", "custom-dnd5e-counters");
-    navItem.textContent = game.i18n.localize("CUSTOM_DND5E.counters");
+    if ( nav.classList.contains("sheet-tabs") ) {
+      navItem.setAttribute("data-action", "tab");
+      navItem.setAttribute("data-group", "primary");
+      const span = document.createElement("span");
+      span.textContent = game.i18n.localize("CUSTOM_DND5E.counters");
+      navItem.appendChild(span);
+    } else {
+      navItem.classList.add("item");
+      navItem.textContent = game.i18n.localize("CUSTOM_DND5E.counters");
+    }
     nav.appendChild(navItem);
   }
 }
@@ -443,8 +738,13 @@ async function insertCounters(sheetType, counters, app, html, data) {
   if ( app?._tabs?.[0]?.active === "custom-dnd5e-counters" ) {
     context.active = " active";
   }
-  const template = await foundry.applications.handlebars.renderTemplate(sheetType.template, context);
   const element = html.querySelector(sheetType.insert.class);
+  const existing = element.querySelector("#custom-dnd5e-counters");
+  if ( existing ) {
+    context.active = existing.classList.contains("active") ? " active" : "";
+    existing.remove();
+  }
+  const template = await foundry.applications.handlebars.renderTemplate(sheetType.template, context);
   element.insertAdjacentHTML(sheetType.insert.position, template);
   return element.querySelector("#custom-dnd5e-counters");
 }
@@ -473,6 +773,7 @@ export function setupCounterInteractions(entity, counters, container, editable) 
     if ( !counter.canEdit ) return;
 
     const counterElement = container.querySelector(`[data-id="${key}"]`);
+    if ( !counterElement ) return;
     const links = counterElement.querySelectorAll(".custom-dnd5e-counters-link");
     const inputs = counterElement.querySelectorAll("input");
 
@@ -495,6 +796,11 @@ export function setupCounterInteractions(entity, counters, container, editable) 
           if ( input.dataset?.input === "value" ) {
             input.addEventListener("keyup", () => checkValue(input, entity, key), true);
           }
+        });
+        break;
+      case "pips":
+        counterElement.querySelectorAll(".pip").forEach(pip => {
+          pip.addEventListener("click", () => togglePip(entity, counter.property, Number(pip.dataset.n)));
         });
         break;
       case "successFailure":
@@ -587,6 +893,22 @@ export function toggleCheckbox(entity, counterKey) {
   counterKey = (counterKey.startsWith("counters.")) ? `${counterKey}.value` : counterKey;
   const flag = entity.getFlag(MODULE.ID, counterKey);
   entity.setFlag(MODULE.ID, counterKey, !flag);
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Toggle a pip on a pips counter.
+ * @param {object} entity The entity: actor or item
+ * @param {string} counterKey The counter key
+ * @param {number} n The pip number to toggle
+ */
+export function togglePip(entity, counterKey, n) {
+  const currentValue = entity.getFlag(MODULE.ID, counterKey) ?? 0;
+  const max = getMax(entity, counterKey);
+  const newValue = (currentValue === n) ? n - 1 : n;
+  if ( max && newValue > max ) return;
+  entity.setFlag(MODULE.ID, counterKey, newValue);
 }
 
 /* -------------------------------------------- */
@@ -849,12 +1171,48 @@ function getCounters(entity, key = null) {
 /* -------------------------------------------- */
 
 /**
+ * Resolve a max value, handling attribute paths (e.g. @scale.monk.ki-points).
+ * @param {object} entity The entity: actor or item
+ * @param {number|string} max The max value or attribute path
+ * @returns {number|null} The resolved max value
+ */
+/**
+ * Resolve a trigger value, handling attribute paths (e.g. @abilities.str.mod).
+ * @param {object} entity The entity: actor or item
+ * @param {number|string} value The trigger value or attribute path
+ * @returns {number|null} The resolved trigger value
+ */
+function resolveTriggerValue(entity, value) {
+  if ( typeof value === "string" && value.startsWith("@") ) {
+    return foundry.utils.getProperty(entity.system, value.substring(1)) ?? null;
+  }
+  return value;
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Resolve a max value, handling attribute paths (e.g. @scale.monk.ki-points).
+ * @param {object} entity The entity: actor or item
+ * @param {number|string} max The max value or attribute path
+ * @returns {number|null} The resolved max value
+ */
+function resolveMax(entity, max) {
+  if ( typeof max === "string" && max.startsWith("@") ) {
+    return foundry.utils.getProperty(entity.system, max.substring(1)) ?? null;
+  }
+  return max || null;
+}
+
+/* -------------------------------------------- */
+
+/**
  * Get the counter's max value.
  * @param {object} entity The entity: actor or item
  * @param {string} key The counter key
- * @returns {number} The max value
+ * @returns {number|null} The max value
  */
 function getMax(entity, key) {
   const setting = getCounters(entity, key);
-  return setting?.max;
+  return resolveMax(entity, setting?.max);
 }

@@ -366,6 +366,7 @@ export const CONSTANTS = {
       EDIT: "modules/custom-dnd5e/templates/counters-edit.hbs",
       TRIGGERS_LIST: "modules/custom-dnd5e/templates/counters-triggers-list.hbs",
       DND5E_ACTOR: "modules/custom-dnd5e/templates/counters/dnd5e/counters-actor.hbs",
+      DND5E_ITEM_GROUP: "modules/custom-dnd5e/templates/counters/dnd5e/counters-item-group.hbs",
       DND5E_ITEM_GROUP_LEGACY: "modules/custom-dnd5e/templates/counters/dnd5e/counters-item-group-legacy.hbs"
     }
   },
@@ -579,6 +580,12 @@ export const CONSTANTS = {
       },
       EXHAUSTION_SAVING_THROW_DC: {
         KEY: "exhaustion-saving-throw-dc"
+      },
+      EXHAUSTION_SAVING_THROW_DC_SCALING: {
+        KEY: "exhaustion-saving-throw-dc-scaling"
+      },
+      EXHAUSTION_ANIMATION: {
+        KEY: "exhaustion-animation"
       }
     }
   },
@@ -1239,31 +1246,17 @@ export const SHEET_TYPE = {
       position: "afterbegin"
     }
   },
-  GroupActorSheet: {
-    countersSetting: CONSTANTS.COUNTERS.SETTING.GROUP_COUNTERS.KEY,
-    character: false,
-    custom: false,
-    group: true,
-    item: false,
-    legacy: true,
-    npc: false,
-    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ITEM_GROUP_LEGACY,
-    insert: {
-      class: "section.sheet-body",
-      position: "beforeend"
-    }
-  },
   ItemSheet5e: {
     countersSetting: CONSTANTS.COUNTERS.SETTING.ITEM_COUNTERS.KEY,
     character: false,
     custom: false,
     group: false,
     item: true,
-    legacy: true,
+    legacy: false,
     npc: false,
-    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ITEM_GROUP_LEGACY,
+    template: CONSTANTS.COUNTERS.TEMPLATE.DND5E_ITEM_GROUP,
     insert: {
-      class: "section.sheet-body",
+      class: "section.window-content",
       position: "beforeend"
     }
   },

@@ -1,5 +1,5 @@
 import { CONSTANTS, MODULE } from "./constants.js";
-import { c5eLoadTemplates, getSetting, registerSetting } from "./utils.js";
+import { c5eLoadTemplates, getSetting, registerSetting, blurScreen, flashScreen, shakeScreen, swayScreen, vignetteScreen } from "./utils.js";
 import { register as registerGameplay, registerNegativeHp } from "./gameplay/gameplay.js";
 import { register as registerAbilities, setConfig as setAbilities } from "./configurations/abilities.js";
 import { register as registerActivationCosts, setConfig as setActivationCosts } from "./configurations/activation-costs.js";
@@ -30,7 +30,8 @@ import {
   modifySuccess,
   increaseFailure,
   decreaseFailure,
-  modifyFailure
+  modifyFailure,
+  togglePip
 } from "./counters/counters.js";
 import { register as registerCreatureTypes, setConfig as setCreatureTypes } from "./configurations/creature-types.js";
 import { register as registerCurrency, setConfig as setCurrency } from "./configurations/currency.js";
@@ -100,6 +101,13 @@ Hooks.on("init", async () => {
 
   const module = game.modules.get(MODULE.ID);
   module.api = {
+    animations: {
+      blurScreen,
+      flashScreen,
+      shakeScreen,
+      swayScreen,
+      vignetteScreen
+    },
     counters: {
       checkCheckbox,
       uncheckCheckbox,
@@ -115,9 +123,18 @@ Hooks.on("init", async () => {
       modifySuccess,
       increaseFailure,
       decreaseFailure,
-      modifyFailure
+      modifyFailure,
+      togglePip
     }
   };
+
+  const animationHandlers = { blurScreen, flashScreen, shakeScreen, swayScreen, vignetteScreen };
+  game.socket.on(`module.${MODULE.ID}`, (data) => {
+    if ( data.action === "animation" ) {
+      const handler = animationHandlers[data.type];
+      if ( handler ) handler(data.options);
+    }
+  });
 
   registerSetting(
     CONSTANTS.DEBUG.SETTING.KEY,
@@ -231,7 +248,7 @@ Hooks.on("ready", async () => {
       return allowed.includes(value);
     },
     customDnd5eShowTriggerValue: function(value) {
-      const allowed = ["counterValue"];
+      const allowed = ["counterValue", "successValue", "failureValue", "rollAttack"];
       return allowed.includes(value);
     }
   });
